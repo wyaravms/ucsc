@@ -193,8 +193,6 @@ legend("topright",legend=c("Exact","Normal"),lwd=c(3,1))
 
 curve(post(x,theta2=12,sumy=sumy,y1=y1,n=n)/I$value/dmt(x,15,0.5,2),from=10,to=18, ylab="Weight",xlab="log trans",main="Weight = g/p")
 
-# using package
-
 # importance sampling
 post = function(theta,postpar) {
   sumy = postpar$sumy
