@@ -4,11 +4,11 @@ library(LearnBayes)
 library(mvtnorm)
 
 # pump failured
-n=8
+n = 8
 
 # sufficient statistic
-y1=23721
-sumy=15962989
+y1 = 23721
+sumy = 15962989
 
 # transformed parameters ~ 
 log(sumy)
@@ -21,7 +21,8 @@ logpost = function(theta,postpar) {
   y1 = postpar$y1
   n = postpar$n
   logpostr = -n*theta1 - ((1/exp(theta1)*(sumy - n*(y1 - exp(theta2))))) + theta1 + theta2
-  return(logpostr)}
+  return(logpostr)
+}
 
 postpar=list(sumy=sumy,y1=y1,n=n)
 
@@ -34,8 +35,8 @@ logf = function(theta, postpar) {
   return(val)
 }
 
-limits=c(12,18,0,25)
-ng=100
+limits = c(12,18,0,25)
+ng = 100
 x0 = seq(limits[1], limits[2], len = ng)
 y0 = seq(limits[3], limits[4], len = ng)
 X = outer(x0, rep(1, ng))
@@ -55,7 +56,8 @@ logpost = function(theta,postpar) {
   y1 = postpar$y1
   n = postpar$n
   logpostr = -n*theta1 - ((1/exp(theta1)*(sumy - n*(y1 - exp(theta2))))) + theta1 + theta2
-  return(logpostr)}
+  return(logpostr)
+}
 
 postpar=list(sumy=sumy,y1=y1,n=n)
 
@@ -79,8 +81,8 @@ logf_n = function(theta, tpar) {
   return(val)
 }
 
-limits=c(12,18,0,25)
-ng=100
+limits = c(12,18,0,25)
+ng = 100
 x0 = seq(limits[1], limits[2], len = ng)
 y0 = seq(limits[3], limits[4], len = ng)
 X = outer(x0, rep(1, ng))
@@ -98,17 +100,16 @@ log_rej = function(theta,postpar,tpar){
   return(l_rej)
 }
 
-tpar=list(m=mean1,var=Var1,df=3)
+tpar = list(m=mean1,var=Var1,df=3)
 
-start=c(15,15)
-theta_rej=optim(par=start,log_rej,postpar=postpar,tpar=tpar,method="BFGS",hessian = TRUE, control = list(fnscale = -1))
+start = c(15,15)
+theta_rej = optim(par=start,log_rej,postpar=postpar,tpar=tpar,method="BFGS",hessian = TRUE, control = list(fnscale = -1))
 theta_rej$par
 
-dmax=log_rej(theta_rej$par,postpar=postpar,tpar=tpar)
+dmax = log_rej(theta_rej$par,postpar=postpar,tpar=tpar)
 dmax
 
 # Accept/reject method
-set.seed(7)
 M = 15000
 d = length(tpar$m)
 theta = rmt(M,mean = c(tpar$m), S = tpar$var, df = tpar$df)
@@ -154,7 +155,7 @@ sir_sexp = function (logf, tpar, n, infor)
   return(theta)
 }
 
-theta=sir_sexp(logpost,tpar,nd,postpar)
+theta = sir_sexp(logpost,tpar,nd,postpar)
 
 plot(theta[,1],theta[,2],xlim=c(12.5,18),ylim=c(0,19),
      xlab=expression(theta[1]),ylab=expression(theta[2]),pch=1)
@@ -172,7 +173,7 @@ post = function(theta1,theta2,sumy,y1,n) {
   return(exp(logpostr- max(logpostr)))} 
 
 
-I=integrate(post,10,18,theta2=12,sumy=sumy,y1=y1,n=n)
+I = integrate(post,10,18,theta2=12,sumy=sumy,y1=y1,n=n)
 par(mfrow=c(1,1))
 
 #using normal distribution as proposal distribution
@@ -203,8 +204,8 @@ post = function(theta,postpar) {
   logpostr = -n*theta1 - ((1/exp(theta1)*(sumy - n*(y1 - exp(theta2))))) + theta1 + theta2
   return(logpostr)} 
 
-tpar=list(m=mean1,var=2*Var1,df=2)
-postpar=list(sumy=sumy,y1=y1,n=n)
+tpar = list(m=mean1,var=2*Var1,df=2)
+postpar = list(sumy=sumy,y1=y1,n=n)
 
 imporsampl = function (logf, tpar, h, n, data) 
 {
@@ -223,9 +224,9 @@ imporsampl = function (logf, tpar, h, n, data)
 }
 
 # mean
-myfunc=function(theta) return(theta[2])
+myfunc = function(theta) return(theta[2])
 
-s=imporsampl(post,tpar,myfunc,10000,postpar)
+s = imporsampl(post,tpar,myfunc,10000,postpar)
 cbind(s$est,s$se)
 mu = s$est
 mu
@@ -233,9 +234,9 @@ mu
 hist(s$wt,freq=FALSE)
 
 # second moment
-myfunc=function(theta) return(theta[1]^2)
+myfunc = function(theta) return(theta[1]^2)
 
-s=imporsampl(post,tpar,myfunc,10000,postpar)
+s = imporsampl(post,tpar,myfunc,10000,postpar)
 cbind(s$est,s$se)
 mu2 = s$est
 mu2
@@ -244,7 +245,7 @@ var_theta = mu2 - mu^2
 var_theta
 
 # variance
-myfunc=function(theta) return((theta[2]-mu)^2)
+myfunc = function(theta) return((theta[2]-mu)^2)
 
 s=imporsampl(post,tpar,myfunc,10000,postpar)
 cbind(s$est,s$se)
@@ -256,7 +257,7 @@ points(s$theta[,1],s$theta[,2])
 
 # laplace approximation
 
-myfunc=function(theta) return(log(theta))
+myfunc = function(theta) return(log(theta))
 
 post_laplace = function(theta,postpar,myfunc) {
   sumy = postpar$sumy
@@ -265,8 +266,8 @@ post_laplace = function(theta,postpar,myfunc) {
   theta1 = theta[1]
   theta2 = theta[2]
   logpostr = -n*theta1 - ((1/exp(theta1)*(sumy - n*(y1 - exp(theta2))))) + theta1 + theta2 - log(myfunc(theta1)) - log(myfunc(theta2))
-  return(logpostr)} 
-
+  return(logpostr)
+} 
 
 start=c(15,13)
 theta_lap=optim(par=start,post_laplace,postpar=postpar, myfunc=myfunc,method="BFGS",hessian = TRUE, control = list(fnscale = -1))
