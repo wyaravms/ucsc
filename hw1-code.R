@@ -1,5 +1,6 @@
 
 rm(list=ls(all=TRUE))
+set.seed(7)
 library(LearnBayes)
 library(mvtnorm)
 
