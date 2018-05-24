@@ -1,0 +1,485 @@
+\documentclass[a4paper, 11pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[margin=1in]{geometry} 
+\usepackage{amsmath,amsthm,amssymb}
+\usepackage{listings}
+\usepackage{graphicx}
+\usepackage{indentfirst}
+\renewcommand{\baselinestretch}{1}
+\usepackage{subcaption}
+\usepackage{float}
+\usepackage{dsfont} %change indicator function
+\graphicspath{ {images/} }
+\usepackage{comment} % enables the use of multi-line comments (\ifx \fi) 
+\usepackage{fullpage} % changes the margin
+
+\begin{document}
+%Header-Make sure you update this information!!!!
+\noindent
+{\Large\textbf{Homework 1} \hfill \\
+AMS 207 \hfill Spring 2018 \\
+Wyara Vanesa Moura e Silva \hfill April 19\\}
+
+\section*{Question 3}
+
+The failure time of a pump follows a two-parameter exponential distribution, 
+
+\begin{equation*}
+f(y|b,m) = \dfrac{1}{b} \exp\left\{-\dfrac{(y-m)}{b}\right\}, \hspace{0.5cm} \mbox{when} \hspace{0.5cm} y\geq m.
+\end{equation*}
+
+For the two-parameter exponential distribution this function is defined when $f(y|b,m)>0$, and $b>0$. In which, $m$ is the location parameter.
+
+\subsection*{3.1} Obtain the likelihood for $b$ and m based on an i.i.d. sample of size $n$.
+
+\noindent
+\textit{Solution:}\\
+
+The likehood function for $b$ and $m$ is given by:
+
+\begin{equation*}
+\begin{array}{lclll}
+f(\textbf{y}|b,m) & = & \displaystyle\prod_{i=1}^{n} \dfrac{1}{b} \exp\left\{-\dfrac{(y_i-m)}{b}\right\} \mathds{I} \left( y_i\geq m\right) \\
+& = & \left(\dfrac{1}{b}\right)^n \exp\left\{-\dfrac{1}{b}\displaystyle\sum_{i=1}^{n}(y_i-m)\right\}  \mathds{1} \left(\mbox{min}\left\{ y_i \right\}^{n}_{i=1}\geq m\right)  \\
+& = & \left(\dfrac{1}{b}\right)^n \exp\left\{-\dfrac{1}{b}\left(\displaystyle\sum_{i=1}^{n}y_i - nm\right)\right\}  \mathds{1} \left(\mbox{min}\left\{ y_i \right\}^{n}_{i=1}\geq m\right)  \\
+\end{array}
+\end{equation*}
+
+\subsection*{3.2} Consider a suitable transformation that maps the parameters $b$ and $m$ to the plane.
+
+\noindent
+\textit{Solution:} \\
+
+As $b>0$, a suitable transformation would be to use the logarithm transformation $\log(b)$, which will maps the parameter space to the real line $\mathds{R}$.
+
+Regarding the location parameter $m$, we have that the constraint for this parameter is $y\geq m$. As $y>0$ being the time of failure. Then, using the logarithm transformation of the $\log(y_{(1)} - m)$ the parameter space will be now the real line $\mathds{R}$.
+
+\subsection*{3.3}
+Consider a sample of 8 pumps, where all pumps failed at some time. The smallest failure time was 23721 minutes and the total testing time for all pumps was 15962989 minutes. Assume a sensible prior for the transformed parameters and explore the contours of the posterior distribution.
+
+\noindent
+\textit{Solution:}\\
+
+As informations given by the question, we have: the smallest failure time which is $y_{(1)}=23721$ minutes. In addition, the total testing time for $n=8$ pumps (where all pumps failed at some time) which is $\sum_{i=1}^{n}y_i=15962989$ minutes. The $1/b$ represents the mean time to failure. We can conclude by looking the likelihood function that the $y_{(1)}$ and $\sum_{i=1}^{n}y_i$ happens to be the sufficient statistics for the parameters $m$ and $b$, respectively.\\
+
+It was chose to use a noninformative prior, a flat prior with uniform distribution for the parameters $(b, m)$, then it was got as posterior distribution:
+\begin{equation*}
+\begin{array}{lclll}
+\pi(b,m|\textbf{y}) & = & f(\textbf{y}|b,m)\pi(b,m) \\
+& = & \left(\dfrac{1}{b}\right)^n \exp\left\{-\dfrac{1}{b}\left(\displaystyle\sum_{i=1}^{n}y_i - nm\right)\right\}  \mathds{1} \left(\mbox{min}\left\{ y_i \right\}^{n}_{i=1}\geq m\right)  \\
+\end{array}
+\end{equation*}
+
+Now, in order to do the transformation for this posterior function, for the transformed parameters given below, and using the Jacobian matrix result:
+\begin{equation*}
+\begin{array}{rclll}
+\theta_1 & = & \log (b) \\
+\theta_2 & = & \log(y_{(1)} - m) \\
+J(\theta_1, \theta_2) & = & \left(
+    \begin{array}{cc}
+      \exp(\theta_1)  & 0\\
+      0 &  -\exp(\theta_2) 
+    \end{array}
+        \right) \\
+\end{array}
+\end{equation*}
+
+Then, the posterior distribution of the transformed parameters will be
+\begin{equation*}
+\begin{array}{lclll}
+\pi(\theta_1,\theta_2|\textbf{y}) & = & \left(\dfrac{1}{e^{\theta_1}}\right)^n \exp\left\{-\dfrac{1}{e^{\theta_1}}\left(\displaystyle\sum_{i=1}^{n}y_i - n(y_{(1)} - e^{\theta_2})\right)\right\} | J(\theta_1, \theta_2) | \mathds{1} \left(\theta_1\in\mathds{R}\right) \mathds{1} \left(\theta_2\in\mathds{R}\right) \\
+& = & \left(\dfrac{1}{e^{\theta_1}}\right)^n \exp\left\{-\dfrac{1}{e^{\theta_1}}\left(\displaystyle\sum_{i=1}^{n}y_i - n(y_{(1)} - e^{\theta_2})\right)\right\} \exp (\theta_1 + \theta_2) \mathds{1} \left(\theta_1\in\mathds{R}\right) \mathds{1} \left(\theta_2\in\mathds{R}\right) \\
+\end{array}
+\end{equation*}
+
+And the log-posterior distribution it is given by:
+\begin{equation*}
+\begin{array}{lclll}
+\log(\pi(\theta_1,\theta_2|\textbf{y})) & = & -n\theta_1 -\dfrac{1}{e^{\theta_1}}\left(\displaystyle\sum_{i=1}^{n}y_i - n(y_{(1)} - e^{\theta_2})\right) +(\theta_1 + \theta_2) \\
+\end{array}
+\end{equation*}
+
+In Figure \ref{fig1} is shown the contour plot for the joint posterior distribution of the transformed parameters ($\theta_1,\theta_2$), we can notice that the joint distribution exhibit an asymmetric shape.
+\begin{figure}[H]
+\centering
+\caption{Contour plot of the joint posterior distribution of the transformed parameters $\theta_1$ and $\theta_2$.}
+\label{fig1}
+\includegraphics[width = 0.6\textwidth, height =0.3\textheight]{contour-1.pdf}
+\end{figure}
+
+\subsection*{3.4} Find a normal approximation to the posterior distribution of the transformed parameters.
+
+\noindent
+\textit{Solution:}\\
+
+Using a large $n$ and given that the $\pi(\theta_1,\theta_2)|\textbf{y})$ satisfy some regularity conditions, we can do the normal approximation for this posterior by: First, using the second order Taylor series expansion evaluated under $\hat{\theta_1}$ and $\hat{\theta_2}$, in which these are the maximum likelihood estimators. Then, setting $\boldsymbol{\theta} = [\theta_1, \theta_2]^T$ and $\boldsymbol{\hat{\theta}} = [\hat{\theta_1}, \hat{\theta_1}]^T$, we get the approximation:
+%  \nabla \log(\pi(\boldsymbol{\hat{\theta}}|\textbf{y}))\cdot (\boldsymbol{\theta} - \boldsymbol{\hat{\theta}})
+\begin{equation}
+\begin{array}{lclll}
+\log(\pi(\boldsymbol{\theta}|\textbf{y})) & \approx &  \log(\pi(\boldsymbol{\hat{\theta}}|\textbf{y}) + \dfrac{1}{2} (\boldsymbol{\theta} - \boldsymbol{\hat{\theta}})^T \mathcal{H}_{ \log(\pi(\boldsymbol{\hat{\theta}}|\textbf{y}))}(\boldsymbol{\theta} - \boldsymbol{\hat{\theta}})\\
+\end{array} 
+\label{eq1}
+\end{equation}
+
+The results values that compose the hessian matrix $\mathcal{H}_{ \log(\pi(\boldsymbol{\hat{\theta}}|\textbf{y}))}$ are:
+
+\begin{equation*}
+\begin{array}{rclll}
+\mathcal{H}_{ \log(\pi(\boldsymbol{\hat{\theta}}|\textbf{y}))} & = & \left(
+    \begin{array}{cc}
+     - \left[e^{-\theta_1} \left( \displaystyle\sum_{i=1}^{n}y_i - n(y_{(1)} - e^{\theta_2})  \right)\right]  & n e^{-\theta_1}e^{\theta_2}\\
+      n e^{-\theta_1}e^{\theta_2} &  n(-e^{-\theta_1})e^{\theta_2}
+    \end{array}
+        \right)
+\end{array}
+\end{equation*}
+
+Then, using that expansion in (\ref{eq1}), the approximation for the posterior density will have as distribution: $\mbox{Normal} \left(\boldsymbol{\hat{\theta}}, [\mbox{I}_f(\boldsymbol{\hat{\theta}})]^{-1}  \right)$. Which we can find the Fisher information by using the hessian matrix. It was used the \texttt{optim} function in \texttt{R} to find the values for the parameters, and the results were: 
+\begin{equation}
+\begin{array}{rclll}
+\boldsymbol{\hat{\theta}} & = & (14.7821, 12.7027) \\
+\left[\mbox{I}_f(\boldsymbol{\hat{\theta}})\right]^{-1} & = & \left(
+    \begin{array}{cc}
+     0.1666696  & 0.1666696\\
+     0.1666696  & 1.1666411 
+    \end{array}
+        \right) \\
+\end{array}
+\label{eq2}
+\end{equation}
+
+Figure \ref{fig2} displays the contours of the normal approximation of the transformed parameters $\theta_1$ and $\theta_2$. 
+\begin{figure}[H]
+\centering
+\caption{Contour plot of the normal approximation of the transformed parameters $\theta_1$ and $\theta_2$.}
+\label{fig2}
+\includegraphics[width = 0.6\textwidth, height =0.3\textheight]{contour-2.pdf}
+\end{figure}
+
+Comparing Figure \ref{fig1} and \ref{fig2} we can see a difference between the exact and the normal approximation for the posterior. As in Figure \ref{fig1}, we can see the asymmetrical shape of the distribution in the contour plot in \ref{fig2} using the normal approximation.
+
+Figure \ref{fig2-1} shows the contour plot of the exact density overlaid on the normal approximation of the transformed parameters $\theta_1$ and $\theta_2$. We can notice that for value of $\theta_2$ less than 8, the normal approximation does not make a good fit. In addition, the tails of the exact density seems to be heavier than the normal approximation for the posterior.
+\begin{figure}[H]
+\centering
+\caption{Contour plot of the exact overlaid on the normal approximation of the transformed parameters $\theta_1$ and $\theta_2$.}
+\label{fig2-1}
+\includegraphics[width = 0.6\textwidth, height =0.3\textheight]{contour-1-2.pdf}
+\end{figure}
+
+\subsection*{3.5} Use rejection sampling and SIR to approximate the posterior distribution. Compare.
+
+\noindent
+\textit{Solution:}\\
+
+For the rejection sampling method; first it was chose a bivariate t distribution as proposal distribution $p(\boldsymbol{\theta})$ that resembles the posterior density, and another reason is that we need a function that has thicker tails.
+
+The parameters for the proposal distribution are given by: $p(\boldsymbol{\theta}) \sim BVT_{3}(\boldsymbol{\hat{\theta}}, \hat{\Sigma})$. In which, the degree of freedom is $\nu = 3$, the maximum likelihood estimator $\boldsymbol{\hat{\theta}}$ found in Question \textbf{3.3} was used as the location parameter, and covariance matrix $\hat{\Sigma}$ found in Question \textbf{3.3}  was used as scale matrix. These values are in (\ref{eq2}).
+
+Then, in order to find the identifiable constant $M$, it is necessary to maximize the function $\log(\pi(\boldsymbol{\theta}|\textbf{y})) - \log(p(\boldsymbol{\theta}))$. And it was found that the maximum value $\log(M)$ occurs at the value of $\boldsymbol{\theta} = ( 15.6444, 13.5649)$. In which we can notice that this values of $\boldsymbol{\theta}$ are not at the extreme part of the parametric space. This gives an indication that the value found for $M$ is in fact an approximate maximum. The value found was $M = -96.2857$ for the identifiable constant. 
+
+The original sample size was 15,000, and the acceptance rate was 0.58, being a reasonable value. Figure \ref{fig3} shows the contour plot with the simulated draws from the rejection method. 
+
+We can see in Figure \ref{fig3} that most of the draws fall within the inner contour of the posterior density. However, at the two upper ends there are no points.
+
+\begin{figure}[H]
+\centering
+\caption{Contour plot of transformed parameters $\theta_1$ and $\theta_2$ with simulated draws from the rejection algorithm.}
+\label{fig3}
+\includegraphics[width = 0.6\textwidth, height =0.3\textheight]{contour-3.pdf}
+\end{figure}
+
+For the sampling importance resampling (SIR), as in the rejection method it was chose a bivariate t distribution as proposal distribution $p(\boldsymbol{\theta})$, where $p(\boldsymbol{\theta}) \sim BVT_{3}(\boldsymbol{\hat{\theta}}, \hat{\Sigma})$. Then, it was computed the weights. 
+
+The sample size was chose as the size of the accepted sample in the rejection method $n=8794$. Figure \ref{fig4} shows the contour plot of the transformed parameters ($\boldsymbol{\theta}$) with the simulated draws from the SIR method. 
+
+Looking at Figure \ref{fig4} it is noticed that even two points being out of the contour plot, the most of the draws fall within the inner contour of the posterior density, and now the two upper ends are more covered by the simulated points.
+
+\begin{figure}[H]
+\centering
+\caption{Contour plot of transformed parameters $\theta_1$ and $\theta_2$ with simulated draws from the SIR algorithm.}
+\label{fig4}
+\includegraphics[width = 0.6\textwidth, height =0.3\textheight]{contour-4.pdf}
+\end{figure}
+
+Thus, by looking the scatted plots in Figure \ref{fig3} and \ref{fig4} of the simulated points using the two methods, seems that the SIR method gets more accurate results for the simulated points because the simulated draws had covered better the exact density of the posterior distribution.
+
+\subsection*{3.6} Use importance sampling as well as a Laplace approximation to estimate the posterior mean and variance of the transformed parameters.
+
+\noindent
+\textit{Solution:}\\
+
+Using the importance sampling, it was chose a bivariate t distribution as proposal distribution $p(\boldsymbol{\theta})$, where $p(\boldsymbol{\theta}) \sim BVT_{3}(\boldsymbol{\hat{\theta}}, \hat{\Sigma})$, the same parameters as in previous methods.
+
+It was found for the posterior mean $\mathds{E} (\boldsymbol{\theta}) = (14.8658, 12.2319)$, and for the variance $\mathds{V}\mbox{ar} = (0.1787,1.8085)$
+
+The values found in (\ref{eq2}) are the estimates for the posterior moments of the approximating normal density, in summary, we have $\mathds{E} (\boldsymbol{\theta}) = (14.7821, 12.7027)$, and for the variance $\mathds{V}\mbox{ar} = (0.1666,1.1666)$. Which this approximation is called first order approximation. However, these are not a good estimates given that our exact density differs a little from the normal distribution. 
+
+However, as said by Carlin \& Louis (2008) "the second-order accuracy provided by Laplace’s method is comforting, and is surely better than the first-order accuracy provided by the normal approximation for any given dataset we will still lack a numerical measurement of how far our approximate posterior expectations are from their exact values". \\
+
+\noindent
+\textbf{Reference} \\
+Carlin, B. P., \& Louis, T. A. (2008). Bayesian methods for data analysis. CRC Press.
+
+\subsection*{3.7} Define the reliability at time $t_0$ as R$(t_0) = \exp(-(t_0 -m)/b)$. Describe the posterior moments and the posterior distribution of R$(10^6)$.
+
+\noindent
+\textit{Solution:}\\
+
+The reliability in this case is the probability that a pump does not fail before time $t_0$. In Figure \ref{fig5} is shown the posterior density for the reliability at time $t_0 = 10^6$. 
+
+\begin{figure}[H]
+\centering
+\caption{Posterior density for the reliability at time $t_0 = 10^6$.}
+\label{fig5}
+\includegraphics[width = 0.6\textwidth, height =0.3\textheight]{part-7.pdf}
+\end{figure}
+
+The moments found for this distribution were: $\mathds{E}($R$(10^6)) = 0.6197$ which represents the probability mean of the pump does not fail before $10^6$ minutes. For the variance, $\mathds{V}\mbox{ar}($R$(10^6)) = 0.0128$, and the credible interval $(0.3854099, 0.8216955)$.
+
+
+\newpage
+\subsection*{R Code}
+
+See below all the R Code used to perform the analysis.
+
+\begin{verbatim}
+rm(list=ls(all=TRUE))
+library(mvtnorm)
+
+# pump failured
+n=8
+
+# sufficient statistic
+y1=23721
+sumy=15962989
+
+# part 3.3
+logpost = function(theta,postpar) {
+  theta1 = theta[1]
+  theta2 = theta[2]
+  sumy = postpar$sumy
+  y1 = postpar$y1
+  n = postpar$n
+  logpostr = -n*theta1 - ((1/exp(theta1)*(sumy - n*(y1 - exp(theta2))))) 
+  + theta1 + theta2
+  return(logpostr)}
+
+postpar=list(sumy=sumy,y1=y1,n=n)
+
+logf = function(theta, postpar) {
+  if (is.matrix(theta) == TRUE) {
+    val = matrix(0, c(dim(theta)[1], 1))
+    for (j in 1:dim(theta)[1]) val[j] = logpost(theta[j,], postpar)
+  }
+  else val = logpost(theta, postpar)
+  return(val)
+}
+
+limits=c(12,18,0,25)
+ng=50
+x0 = seq(limits[1], limits[2], len = ng)
+y0 = seq(limits[3], limits[4], len = ng)
+X = outer(x0, rep(1, ng))
+Y = outer(rep(1, ng), y0)
+n2 = ng^2
+den = logf(cbind(X[1:n2], Y[1:n2]), postpar)
+den = den - max(den)
+den = matrix(den, c(ng, ng))
+contour(x0, y0, den,levels = seq(-8.9, 0, by = 2.3), xlim=c(12.5,18),
+		ylim=c(0,19),lwd = 1, xlab=expression(theta[1]),
+        ylab=expression(theta[2]),cex.axis=1.2, cex.lab=1.2)
+
+
+# part 3.4
+start=c(25,25)
+theta_mle = optim(par=start, logpost, postpar=postpar, method="BFGS",
+			hessian = TRUE, control = list(fnscale = -1))
+theta_mle$par
+theta_mle$hessian
+
+fisher = solve(-theta_mle$hessian)
+fisher
+
+mean1 = c(theta_mle$par[1],theta_mle$par[2])
+Var1  = fisher
+tpar=list(m=mean1,var=Var1,df=1)
+
+logf_n = function(theta, tpar) {
+  if (is.matrix(theta) == TRUE) {
+    val = matrix(0, c(dim(theta)[1], 1))
+    for (j in 1:dim(theta)[1]) val[j] = dmvnorm(theta[j,], mean = tpar$m, 
+    sigma = tpar$var,log=TRUE)
+  } else val = dmvnorm(theta, mean = tpar$m, sigma = tpar$var,log=TRUE)
+  return(val)
+}
+
+limits=c(12,18,0,25)
+ng=100
+x0 = seq(limits[1], limits[2], len = ng)
+y0 = seq(limits[3], limits[4], len = ng)
+X = outer(x0, rep(1, ng))
+Y = outer(rep(1, ng), y0)
+n2 = ng^2
+den1 = logf_n(cbind(X[1:n2], Y[1:n2]), tpar)
+den1 = den1 - max(den1)
+den1 = matrix(den1, c(ng, ng))
+contour(x0, y0, den1, levels = seq(-8.9, 0, by = 2.3), xlim=c(12.5,18),
+		ylim=c(0,19),lwd = 1, xlab=expression(theta[1]),
+        ylab=expression(theta[2]),cex.axis=1.2, cex.lab=1.2)
+        
+# part 3.5
+# reject sampling
+log_rej = function(theta,postpar,tpar){
+  l_rej = logpost(theta,postpar) - dmt(theta, mean = c(tpar$m), S = tpar$var, 
+  			df = tpar$df,log=TRUE) 
+  return(l_rej)
+}
+
+tpar=list(m=mean1,var=Var1,df=3)
+
+start=c(15,15)
+theta_rej=optim(par=start,log_rej,postpar=postpar,tpar=tpar,method="BFGS",
+		  	hessian = TRUE, control = list(fnscale = -1))
+theta_rej$par
+
+dmax=log_rej(theta_rej$par,postpar=postpar,tpar=tpar)
+dmax
+
+# accept/reject method
+set.seed(7)
+M = 15000
+d = length(tpar$m)
+theta = rmt(M,mean = c(tpar$m), S = tpar$var, df = tpar$df)
+lf = matrix(0, c(dim(theta)[1], 1))
+
+for (j in 1:dim(theta)[1]) lf[j] = logpost(theta[j,],postpar=postpar)
+
+lg = dmt(theta,  mean = c(tpar$m), S = tpar$var, df = tpar$df, log = TRUE)
+if (d == 1) {
+  prob = exp(c(lf) - lg - dmax)
+  draws1=(theta[runif(n) < prob])
+} else {
+  prob = exp(lf - lg - dmax)
+  draws1=(theta[runif(n) < prob, ])
+}
+
+nd = nrow(draws1)
+accept_rate = nd/M
+accept_rate  
+
+plot(draws1[,1],draws1[,2],xlab=expression(theta[1]),xlim=c(12.5,18),
+		ylim=c(0,19),ylab=expression(theta[2]),pch=1)
+contour(x0, y0, den, levels = seq(-8.9, 0, by = 2.3), xlim=c(12.5,18),
+		ylim=c(0,19),lwd = 1, xlab=expression(theta[1]),ylab=expression(theta[2]),
+        cex.axis=1.2, cex.lab=1.2, add=TRUE)
+
+# SIR method
+set.seed(7)
+sir_sexp = function (logf, tpar, n, infor) 
+{
+  k = length(tpar$m)
+  theta = rmt(n, mean = c(tpar$m), S = tpar$var, df = tpar$df)
+  lf = matrix(0, c(dim(theta)[1], 1))
+  for (j in 1:dim(theta)[1]) lf[j] = logf(theta[j, ], infor)
+  lp = dmt(theta, mean = c(tpar$m), S = tpar$var, df = tpar$df, 
+           log = TRUE)
+  md = max(lf - lp)
+  wt = exp(lf - lp - md)
+  probs = wt/sum(wt)
+  indices = sample(1:n, size = n, prob = probs, replace = TRUE)
+  if (k > 1) 
+    theta = theta[indices, ]
+  else theta = theta[indices]
+  return(theta)
+}
+
+theta=sir_sexp(logpost,tpar,nd,postpar)
+
+plot(theta[,1],theta[,2],xlim=c(12.5,18),ylim=c(0,19),
+     xlab=expression(theta[1]),ylab=expression(theta[2]),pch=1)
+contour(x0, y0, den, levels = seq(-8.9, 0, by = 2.3), xlim=c(13,17),
+		ylim=c(0,19),lwd = 1,xlab=expression(theta[1]),ylab=expression(theta[2]),
+        cex.axis=1.2, cex.lab=1.2, add=TRUE)
+        
+
+# part 3.6
+# importance sampling
+post = function(theta,postpar) {
+  sumy = postpar$sumy
+  y1 = postpar$y1
+  n = postpar$n
+  theta1 = theta[1]
+  theta2 = theta[2]
+  logpostr = -n*theta1 - ((1/exp(theta1)*(sumy - n*(y1 - exp(theta2))))) 
+  + theta1 + theta2
+  return(logpostr)} 
+
+tpar=list(m=mean1,var=Var1,df=3)
+postpar=list(sumy=sumy,y1=y1,n=n)
+
+imporsampl = function (logf, tpar, h, n, data) 
+{
+  theta = rmt(n, mean = c(tpar$m), S = tpar$var, df = tpar$df)
+  lf = matrix(0, c(dim(theta)[1], 1))
+  for (j in 1:dim(theta)[1]) lf[j] = logf(theta[j, ], data)
+  H = lf
+  for (j in 1:dim(theta)[1]) H[j] = h(theta[j, ])
+  lp = dmt(theta, mean = c(tpar$m), S = tpar$var, df = tpar$df, 
+           log = TRUE)
+  md = max(lf - lp)
+  wt = exp(lf - lp - md)
+  est = sum(wt * H)/sum(wt)
+  SEest = sqrt(sum((H - est)^2 * wt^2))/sum(wt)
+  return(list(est = est, se = SEest, theta = theta, wt = wt))
+}
+
+# mean
+myfunc=function(theta) return(theta[2])
+
+s=imporsampl(post,tpar,myfunc,10000,postpar)
+cbind(s$est,s$se)
+mu = s$est
+mu
+
+hist(s$wt,freq=FALSE)
+
+# second moment
+myfunc=function(theta) return(theta[1]^2)
+
+s=imporsampl(post,tpar,myfunc,10000,postpar)
+cbind(s$est,s$se)
+mu2 = s$est
+mu2
+
+var_theta = mu2 - mu^2
+var_theta
+
+# variance
+myfunc=function(theta) return((theta[2]-mu)^2)
+
+s=imporsampl(post,tpar,myfunc,10000,postpar)
+cbind(s$est,s$se)
+var2 = s$est
+var2
+
+
+# part 3.7
+b = function(theta) return(exp(theta[,1]))
+m = function(theta, smin) return(smin - exp(theta[,2]))
+
+t0 = 10^6
+R = function(t0,theta,smin) return(exp(-(t0 - m(theta,smin))/b(theta)))
+hist(R(t0,theta,postpar$y1))
+plot(density(R(t0,theta,postpar$y1)), main="")
+abline(v=mean(R(t0,theta,postpar$y1)), col=2, lty=2)
+abline(v=quantile(R(t0,theta,postpar$y1), probs = c(0.025, 0.975)), col=2, lty=2)
+
+mean(R(t0,theta,postpar$y1))
+var(R(t0,theta,postpar$y1))
+sd(R(t0,theta,postpar$y1))
+quantile(R(t0,theta,postpar$y1), probs = c(0.025, 0.975))
+
+\end{verbatim}
+
+
+\end{document}
