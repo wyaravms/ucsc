@@ -1,0 +1,478 @@
+\documentclass{asaproc}
+
+
+\usepackage[margin=1in]{geometry} 
+\usepackage{amsmath,amsthm,amssymb}
+\usepackage{listings}
+\usepackage{graphicx}
+\usepackage[]{bigints}
+\usepackage{indentfirst}
+\renewcommand{\baselinestretch}{1}
+\usepackage{subcaption}
+\usepackage{float}
+\graphicspath{ {images/} }
+\usepackage{comment} % enables the use of multi-line comments (\ifx \fi) 
+\usepackage{fullpage} % changes th
+%\usepackage{times}
+%If you have times installed on your system, please
+%uncomment the line above
+
+%For figures and tables to stretch across two columns
+%use \begin{figure*} \end{figure*} and
+%\begin{table*}\end{table*}
+% please place figures & tables as close as possible
+% to text references
+
+
+\newcommand{\be}{\begin{equation}}
+\newcommand{\ee}{\end{equation}}
+
+ \title{Analysis of batch variation in yields of dyestuff}
+
+%input all authors' names
+
+\author{Wyara Vanesa Moura e Silva\\
+AMS 206 Quiz 1\\}
+
+%input affiliations
+
+%{USDA Forest Service Forest Products Laboratory}
+
+\begin{document}
+
+\maketitle
+
+
+\begin{abstract}
+
+A data from batch variation in yields of dyestuff, which was first presented by Davies (1967), was analyze using random effects model. And it was found that the variance between the batches got close value with the error variance. However, the joint empirical distribution of these variances was asymmetric.
+
+\begin{keywords}
+batch, random, effects, variance.
+\end{keywords}
+\end{abstract}
+
+\section{Introduction}
+
+The data analyzed represents batch to batch variation in yields of dyestuff. The data arise from a balanced experiment whereby the total product yield was determined for 5 samples from each of 6 randomly chosen batches of raw material. This data was analyzed by Bao \& Tiao (1973). The data can be seen in the following table.
+
+\begin{table}[H]
+\caption{Batch variation in yields of dyestuff.}\label{data}
+\centering
+\begin{tabular}{lccccc}
+\hline
+\mbox{Batch} & & & & & \\
+\hline
+1 & 1545 & 1440 & 1440 & 1520 & 1580 \\
+
+2 & 1540 & 1555 & 1490 &  1560 & 1495\\
+
+3 & 1595 & 1550 & 1605 & 1510 & 1560 \\
+
+4 & 1445 & 1440 & 1595 & 1465 & 1545 \\
+
+5 & 1595 & 1630 & 1515 & 1635 & 1625 \\
+
+6 & 1520 & 1455 & 1450 & 1480 & 1445 \\
+\hline
+\end{tabular}
+\end{table}
+
+One objective of the experiment can be to learn to what extent batch to batch variation in a certain raw material was responsible for variation in the final product yield  (Bao \& Tiao 1973). For the pooled sample mean we have $\bar{\boldsymbol{y}}_{\cdot\cdot} = 1527.50$ and for the pooled sample standard deviation, $\sigma_y = 63.02$. In this paper, we are going to analyze this data using random effects modeling. First, in Section \ref{method} it will be shown the model and methods used in the analysis. Then, the results of the analysis in Section \ref{nap}.
+
+\section{Methods} \label{method}
+
+\subsection{Hierarchical Model} 
+
+Denote $y_{ij}$ the $j$-th observation in the $i$-th batch. In which $i = 1, ..., N$, $N=6$ and $j = 1, ..., n$, $n = 5$. Assuming a model with the following likelihood for the $y_{ij}$, 
+\begin{eqnarray*}
+\begin{array}{lcl ll }
+y_{ij}|b_i,\mu, \sigma_y^2, \sigma_b^2 & \sim & \mathcal{N} (\mu + b_i, \sigma^2_y) 
+\end{array}
+\end{eqnarray*}
+
+and considering the random effects
+\begin{eqnarray*}
+\begin{array}{lcl ll }
+b_i & \sim & \mathcal{N} (0, \sigma^2_b) 
+\end{array}
+\end{eqnarray*}
+
+And in order to complete the model, it was assumed uniform priors for $\mu$, $\sigma^2_y$ and $\sigma^2_b$. Thus, in this model, it is assumed that we have $N$ independents normally distributed data points with each $N$ having its own mean, but the same variance. Now we can evaluate the full conditionals for the three parameters.
+
+The full conditionals distributions, for $\boldsymbol{\theta} = (b_i,\mu, \sigma_y, \sigma_b)$ are given by
+\begin{eqnarray*}
+\begin{array}{lcl ll }
+\pi(b_i|\cdot) & \sim & \mathcal{N}\left( \dfrac{\sigma_b^2}{n\sigma_b^2 + \sigma_y^2} \displaystyle\sum_{j=1}^{n} (y_{ij} - \mu) , \dfrac{\sigma_y^2\sigma_b^2}{n\sigma_b^2 + \sigma_y^2} \right) \\
+
+\pi(\mu|\cdot) & \sim & \mathcal{N}\left( \dfrac{1}{Nn} \displaystyle\sum_{i=1}^{N}\sum_{j=1}^{n} (y_{ij} - b_i) , \dfrac{\sigma_y^2}{Nn} \right) \\
+
+\pi(\sigma_y^2|\cdot) & \sim &  \mathcal{IG} \left( \dfrac{Nn - 2}{2} , \displaystyle\sum_{i=1}^{N}\sum_{j=1}^{n}\frac{\left[ y_{ij} - (\mu + b_i) \right]^2}{2} \right) \\
+
+\pi(\sigma_b^2|\cdot) & \sim &  \mathcal{IG} \left( \dfrac{N-2}{2} , \displaystyle\sum_{i=1}^{N}\dfrac{b_i^2}{2} \right)
+
+\end{array}
+\end{eqnarray*}
+\noindent
+in which the $(\cdot)$ represents the data and all the other variables, $\mathcal{N}$ the normal density, and $\mathcal{IG}$ the inverse gamma density. The steps used to find those full conditionals are given in the Appendix. Now we can use Gibbs sampling to explore the posterior distribution for all the parameters. The idea is to generate posterior samples by sweeping through each variable to sample from its conditional distribution with the remaining variables fixed to their current values.
+
+One thing that can be done it is to evaluate the joint marginal posterior distribution of $\mu$, $\sigma^2_y$ and $\sigma^2_b$. This can be done by integrating out the random effects ($b_1, ..., b_N$), then the marginal posterior density will be given by
+\begin{eqnarray*}
+\begin{array}{lcl ll }
+\pi(\mu, \sigma_y, \sigma_b) & \sim & \displaystyle\prod_{i=1}^{N} \mathcal{N} \left( \bar{y}_{i.} | \mu,  \displaystyle\sqrt[]{\sigma_y^2/n + \sigma_b^2} \right) \times \\\\
+
+ & & \times \hspace{0.3cm} \mathcal{G} \left( S_{i} | (n-1)/2,  1/(2\sigma_y^2) \right) \\
+
+\end{array}
+\end{eqnarray*}
+\noindent
+in which, $\mathcal{N}$ is the normal density, and $\mathcal{G}$ is the gamma density, and $S_i$ is the sum of squares for the $i$-th batch. The steps used to find marginal posterior density are given in the Appendix.
+
+\section{Results}
+
+In the following results, it was obtained $M = 4000$ posterior samples after the burn in period. The results for the inferences about posterior mean and quantiles it is given in Table \ref{inference}.
+
+\begin{table}[H]
+\caption{Summary of inference for the batch variation in yields, posterior mean and quantiles, for all parameters estimated.}\label{inference}
+\centering
+\begin{tabular}{crrrrrr}
+\hline
+ & \mbox{mean} & 25\% & \mbox{median}  & 75\%  \\
+\hline
+$b_1$ & -18.667 &  -103.119 & -18.500 & 67.711 \\
+
+$b_2$ & 1.085 & -82.213 & 0.507 &  91.239\\
+
+$b_3$ & 31.726 & -48.045 & 29.909 & 121.375 \\
+
+$b_4$ & -24.784 & -112.126 & -23.745 & 59.203\\
+
+$b_5$ & 61.418 & -15.952 & 58.979 & 152.498 \\
+
+$b_6$ & -48.123 & -136.857 &  -46.618  &  33.018\\
+
+$\mu$ & 1526.87 & 1447.781 & 1527.822 & 1602.309 \\
+
+$\sigma_y$ & 53.586 & 39.745 & 52.557 & 72.723 \\
+
+$\sigma_b$ & 77.518 & 24.608 &  64.556 & 210.996 \\
+\hline
+\end{tabular}
+\end{table}
+
+Figure \ref{Fig1} shows the curves for the posterior densities of the random effects ($b_1, ..., b_N$). We can see that the densities are slightly centered around zero, as expected.
+\begin{figure}[H]
+\centering
+\caption{Posterior densities for the $b_i$ parameters.}
+\label{Fig1}
+\includegraphics[width = 0.5\textwidth, height =0.3\textheight]{density3.pdf}
+\end{figure}
+
+Figure \ref{Fig2} displays the curves for the posterior densities regarding the parameters $\mu$, $\sigma_y$ and $\sigma_b$. We can see the asymmetry of the posterior distribution for both variances. 
+
+\begin{figure}[H]
+\centering
+\caption{Posterior densities for the three parameters.}
+\label{Fig2}
+\includegraphics[width = 0.5\textwidth, height =0.3\textheight]{density-4.pdf}
+\end{figure}
+
+
+\subsection{Normal approximation}\label{nap}
+
+Using a large $n$ and given that the $\pi(\mu, \log\sigma_y,\log\sigma_b)|\textbf{y})$ satisfy some regularity conditions, we can do the normal approximation for this posterior by: First, using the second order Taylor series expansion evaluated under $\hat{\mu}$, $\log\hat{\sigma_y}$ and $\log\hat{\sigma_b}$, in which these are the posterior mode, the maximum likelihood estimators. Then, setting $\boldsymbol{\theta} = (\mu, \log\sigma_y, \log\sigma_b)^T$ and $\boldsymbol{\hat{\theta}} = (\hat{\mu}, \log\hat{\sigma_y}, \log\hat{\sigma_b})^T$, we get the approximation:
+\begin{equation*}
+\begin{array}{lclll}
+\log(\pi(\boldsymbol{\theta}|\textbf{y})) & \approx & \dfrac{1}{2} (\boldsymbol{\theta} - \boldsymbol{\hat{\theta}})^T \mathcal{H}_{ \log(\pi(\boldsymbol{\hat{\theta}}|\textbf{y}))}(\boldsymbol{\theta} - \boldsymbol{\hat{\theta}})\\
+\end{array} 
+\label{eq1}
+\end{equation*}
+\noindent
+where, $\mathcal{H}_{ \log(\pi(\boldsymbol{\hat{\theta}}|\textbf{y}))}$ is the Hessian matrix. Then, using this expansion, the approximation for the posterior density will have as distribution: $\mbox{Normal} \left(\boldsymbol{\hat{\theta}}, [\mbox{I}_f(\boldsymbol{\hat{\theta}})]^{-1}  \right)$. Which we can find the Fisher information by using the hessian matrix. It was used the \texttt{optim} function in \texttt{R} to find the values for the parameters, this function use the BFGS method which is an optimization algorithm in the family of quasi-Newton methods (Gelman et al., 2014), and the results were: 
+\begin{equation}
+\begin{array}{rclll}
+\boldsymbol{\hat{\theta}} & = & (1527.3107, 3.9176, 3.7688) \\ \\
+
+\left[\mbox{I}_f(\boldsymbol{\hat{\theta}})\right]^{-1} & = & \left(
+    \begin{array}{ccc}
+      397.2024 & -0.0005 & -0.0473 \\
+ 	  -0.0005  & 0.0212 & -0.0039 \\
+ 	 -0.0473 & -0.0039 &  0.1596
+    \end{array}
+        \right) \\
+\end{array}
+\label{eq2}
+\end{equation}
+
+Figure \ref{Fig3} displays the contour plot of the exact density overlaid on the normal distribution for the parameters $\log\sigma_y$ and $\log\sigma_b$, with $\mu$ fixed in its maximum likelihood estimator. We can see a asymmetrical shape of the distribution in the contour plots. In addition, the tails of the exact density seems to be heavier than the normal approximation for the posterior.
+
+\begin{figure}[H]
+\centering
+\caption{Contour plot of the exact overlaid on the normal approximation of the parameters $\log\sigma_y$ and $\log\sigma_b$.}
+\label{Fig3}
+\includegraphics[width = 0.5\textwidth, height =0.3\textheight]{contour-n-e-1.pdf}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\caption{Contour plot of the exact overlaid on the normal approximation of the transformed parameters $\mu$ and $\sigma_y$.}
+\label{Fig4}
+\includegraphics[width = 0.5\textwidth, height =0.3\textheight]{contour-n-e-3.pdf}
+\end{figure}
+
+In Figures \ref{Fig4} and \ref{Fig5} we can see the contour plots of the exact density overlaid on the normal distribution for the parameters $\mu$ by $\log\sigma_y$ and $\mu$ by $\log\sigma_b$, with $\sigma_b$ and $\sigma_y$ fixed in its maximum likelihood estimator, respectively.
+
+For the normal approximation in Figure \ref{Fig4} the posterior distribution seem to fit well with the exact density. In contrast, the approximation in Figure \ref{Fig5} the modeling appears to be the worst, because the exact density has heavier tails than the normal density.
+
+\begin{figure}[H]
+\centering
+\caption{Contour plot of the exact overlaid on the normal approximation of the transformed parameters $\mu$ and $\sigma_b$.}
+\label{Fig5}
+\includegraphics[width = 0.5\textwidth, height =0.3\textheight]{contour-n-e-2.pdf}
+\end{figure}
+
+\subsection{Rejection Sampling and SIR method}
+
+In order to obtain a random draws from the joint marginal distribution for the parameters $\boldsymbol{\theta} = (\mu, \log\sigma_y, \log\sigma_b)^T$, we need to define some features.
+
+First, it was chosen a multivariate $t$ distribution as proposal distribution $\pi(\boldsymbol{\theta})$ that resembles the posterior density, and another reason is that we need a function that has thicker tails.
+
+The parameters for the proposal distribution are given by: $p(\boldsymbol{\theta}) \sim MVT_{3}(\boldsymbol{\hat{\theta}}, \boldsymbol{\hat{\Sigma}})$. In which, the degree of freedom is $\nu = 3$, the maximum likelihood estimator $\boldsymbol{\hat{\theta}}$ found in Section \ref{nap} was used as the location parameter, and covariance matrix $\boldsymbol{\hat{\Sigma}}$ found in Section \ref{nap}  was used as scale matrix. These values are in (\ref{eq2}).
+
+The value found for the identifiable constant the was $M = -78.0820$. And it was found that the maximum value $M$ occurs at the value of $\boldsymbol{\theta} = ( 1444.3140,  3.9177,  4.7733)$. In which we can notice that this values of $\boldsymbol{\theta}$ are not at the extreme part of the parametric space. This gives an indication that the value found for $M$ is, in fact, an approximate maximum. However, the original sample size was $55,000$ and we got the acceptance rate $0.1048$ being a small number.
+
+\begin{figure}[H]
+\centering
+\caption{Contour plot of transformed parameters $\log\sigma_y$ and $\log\sigma_b$ with simulated draws from the rejection algorithm.}
+\label{Figrs}
+\includegraphics[width = 0.5\textwidth, height =0.3\textheight]{rs-1.pdf}
+\end{figure}
+
+For the sampling importance resampling (SIR), as in the rejection method it was chose a multivariate $t$ distribution as proposal distribution $p(\boldsymbol{\theta})$, where $p(\boldsymbol{\theta}) \sim MVT_{3}(\boldsymbol{\hat{\theta}}, \boldsymbol{\hat{\Sigma}})$. Then, it was computed the weights. The sample size was chose as the size of the accepted sample in the rejection method.
+
+\begin{figure}[H]
+\centering
+\caption{Contour plot of transformed parameters $\log\sigma_y$ and $\log\sigma_b$ with simulated draws  from the SIR algorithm.}
+\label{Figsir}
+\includegraphics[width = 0.5\textwidth, height =0.3\textheight]{sir-1.pdf}
+\end{figure}
+
+By looking the scatted plots in Figure \ref{Figrs} and \ref{Figsir} of the simulated points using the two methods, for the transformed parameters $\log\sigma_y$ and $\log\sigma_b$, seems that the rejection method gets more accurate results for the simulated points because the simulated draws had covered better the exact density of the posterior distribution.
+
+In Figure \ref{Fig6}, \ref{Fig7} and \ref{Fig8} we can see the density of the parameters $\mu$, $\log\sigma_y$, $\log\sigma_b$, respectively, with curves from the three methods used to sample draws for the posterior distribution of the given parameters.
+
+\begin{figure}[H]
+\centering
+\caption{Posterior densities for $\mu$ using the three methods of sampling.}
+\label{Fig6}
+\includegraphics[width = 0.5\textwidth, height =0.3\textheight]{density-1-1.pdf}
+\end{figure}
+
+We can notice by looking at these graphs that the three methods got close values for the parameters, except for $\sigma_b$ (Figure \ref{Fig8}) that the location of the distribution using Gibbs sampling had a different value when compared to the method of rejection and SIR.
+
+
+\begin{figure}[H]
+\centering
+\caption{ Posterior densities for $\sigma_y$ using the three methods of sampling.}
+\label{Fig7}
+\includegraphics[width = 0.5\textwidth, height =0.3\textheight]{density1-2.pdf}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\caption{ Posterior densities for $\sigma_b$ using the three methods of sampling.}
+\label{Fig8}
+\includegraphics[width = 0.5\textwidth, height =0.3\textheight]{density1-3.pdf}
+\end{figure}
+
+\vfill
+
+\section{Remarks}
+
+It was modeled the data from batch variation in yields of dyestuff using random effects model. The inference was made by using Gibbs sampling, normal approximation, rejection sampling and SIR method, in which the results obtained were similar in all three methods. Regarding the variance between the batch, it had close value with the variance from the whole data. When it is compared the $\mu$ parameters in the random effect and the variance for the batch we could notice that the distribution was very asymmetric if compared with the behavior between $\mu$ and the variance for the data. 
+
+\section{Appendix}
+
+\subsection{Full Conditionals Distribution}
+
+In this section, it will be showing some steps to find the full conditional distribution of the parameters, and then some steps to obtain the marginal posterior density for $\boldsymbol{\theta}$ = $\textbf{b}_i$, $\mu$, $\sigma_y$, $\sigma_b$.
+
+First, we need the joint posterior distribution, which is given by:
+\begin{small}
+\begin{eqnarray*}
+\begin{array}{lcl ll }
+\pi(\boldsymbol{\theta}|\textbf{y}) & \propto & \pi(\textbf{b}_i,\mu, \sigma_y, \sigma_b)\pi(\textbf{y}|\textbf{b}_i, \mu, \sigma_y, \sigma_b) \\ \\
+
+\pi(\boldsymbol{\theta}|\textbf{y}) & \propto &\displaystyle\prod_{i=1}^{N}  \left(\dfrac{1}{\sigma_b^2}\right)^{-\frac{1}{2}}\mbox{exp}\left\{ \dfrac{ b_i^2}{2\sigma_b^2} \right\} \times \\
+& \times & \displaystyle\prod_{i=1}^{N} \displaystyle\prod_{j=1}^{n} \left(\sigma_y^2\right)^{-\frac{1}{2}}\mbox{exp}\left\{ -\dfrac{(y_{ij} - (\mu - b_i))^2}{2\sigma_y^2}\right\} \\ \\
+
+& \propto & \left(\dfrac{1}{\sigma_b^2}\right)^{-\frac{N}{2}}\mbox{exp}\left\{ \dfrac{1}{2\sigma_b^2}\displaystyle\sum_{i=1}^{N} b_i^2 \right\} \times \\ 
+& \times  &  \left(\dfrac{1}{\sigma_y^2}\right)^{-\frac{Nn}{2}} \mbox{exp}\left\{ -\dfrac{1}{2\sigma_y^2}\displaystyle\sum_{i=1}^{N}\displaystyle\sum_{j=1}^{n}(y_{ij} - (\mu - b_i))^2\right\}
+\end{array}
+\end{eqnarray*}
+\end{small}
+
+Then, we can find all the full conditionals distribution, in which the $(\cdot)$ represents the data and all the other variables, $\mathcal{N}$ the normal density, $\mathcal{G}$ the gamma density, and $\mathcal{IG}$ the inverse gamma density, the results are following:
+
+\begin{itemize}
+\item For $\boldsymbol{b}_i$
+\end{itemize}
+
+\vfill
+
+\begin{small}
+\begin{eqnarray*}
+\begin{array}{lcl ll }
+\pi(b_i|\cdot) & \propto & \mbox{exp}\left\{ \dfrac{1}{2\sigma_b^2}\displaystyle\sum_{i=1}^{N} b_i^2 \right\} \times \\ \\
+& &  \times \mbox{exp}\left\{ -\dfrac{1}{2\sigma_y^2}\displaystyle\sum_{i=1}^{N}\displaystyle\sum_{j=1}^{n}(y_{ij} - (\mu - b_i))^2\right\}\\ \\
+
+& \propto & \mbox{exp}\left\{ \dfrac{1}{2\sigma_b^2}\displaystyle\sum_{i=1}^{N} b_i^2 \right\} \times \\ \\
+& & \times \mbox{exp}\left\{ -\dfrac{1}{2\sigma_y^2}\displaystyle\sum_{i=1}^{N}\displaystyle\sum_{j=1}^{n}( - 2y_{ij}b_i  + 2\mu b_i +  b_i^2\right\}\\ \\
+
+& \propto & \mbox{exp}\left\{ \dfrac{1}{2\sigma_y^2\sigma_b^2}\displaystyle\sum_{i=1}^{N} b_i^2 (\sigma_y^2 + n\sigma_b^2)\right\} \times \\ \\
+& & \times  \mbox{exp}\left\{ -\dfrac{1}{2\sigma_y^2\sigma_b^2}\left[ -2\displaystyle\sum_{i=1}^{N}b_i\sigma_b^2\displaystyle\sum_{j=1}^{n}(y_{ij} - \mu)\right]\right\}\\ \\
+
+& \sim & \mathcal{N}\left( \dfrac{\sigma_b^2}{n\sigma_b^2 + \sigma_y^2} \displaystyle\sum_{j=1}^{n} (y_{ij} - \mu) , \dfrac{\sigma_y^2\sigma_b^2}{n\sigma_b^2 + \sigma_y^2} \right) \\
+
+\end{array}
+\end{eqnarray*}
+\end{small}
+
+\vfill
+\begin{itemize}
+\item For $\mu$
+\end{itemize}
+
+\begin{small}
+\begin{eqnarray*}
+\begin{array}{lcl ll }
+
+\pi(\mu|\cdot) & \propto & \mbox{exp}\left\{ -\dfrac{1}{2\sigma_y^2}\displaystyle\sum_{i=1}^{N}\displaystyle\sum_{j=1}^{n}(y_{ij} - (\mu - b_i))^2\right\}\\ \\
+
+& \propto & \mbox{exp}\left\{- \dfrac{1}{2\sigma_y^2}\displaystyle\sum_{i=1}^{N}\displaystyle\sum_{j=1}^{n}( \mu^2 - 2\mu y_{ij} - 2\mu b_i)\right\}\\ \\
+
+& \propto & \mbox{exp}\left\{- \dfrac{1}{2\sigma_y^2}(Nn\mu^2 - 2\mu\displaystyle\sum_{i=1}^{N}\displaystyle\sum_{j=1}^{n}( y_{ij} - b_i))\right\}\\ \\
+
+& \propto & \mbox{exp}\left\{- \dfrac{Nn}{2\sigma_y^2}(\mu^2 - 2\mu\dfrac{1}{Nn}\displaystyle\sum_{i=1}^{N}\displaystyle\sum_{j=1}^{n}( y_{ij} - b_i)) \right\}\\ \\
+ 
+ 
+ & \sim & \mathcal{N}\left( \dfrac{1}{Nn} \displaystyle\sum_{i=1}^{N}\sum_{j=1}^{n} (y_{ij} - b_i) , \dfrac{\sigma_y^2}{Nn} \right) 
+\end{array}
+\end{eqnarray*}
+\end{small}
+
+\vfill
+
+\begin{itemize}
+\item For $\sigma_y^2$
+\end{itemize}
+
+\begin{small}
+\begin{eqnarray*}
+\begin{array}{lcl ll }
+\pi(\sigma_y^2|\cdot)  & \propto & \left(\sigma_y^2\right)^{-\dfrac{Nn}{2}}\mbox{exp}\left\{ \dfrac{1}{2\sigma_y^2}\displaystyle\sum_{i=1}^{N}\displaystyle\sum_{j=1}^{n} (y_{ij} - (\mu - b_i))^2\right\}\\ \\
+ 
+& \sim &  \mathcal{IG} \left( \dfrac{Nn - 2}{2} , \displaystyle\sum_{i=1}^{N}\sum_{j=1}^{n}\frac{\left[ y_{ij} - (\mu + b_i) \right]^2}{2} \right) 
+\end{array}
+\end{eqnarray*}
+\end{small}
+
+\begin{itemize}
+\item For $\sigma_b^2$
+\end{itemize}
+
+\begin{small}
+\begin{eqnarray*}
+\begin{array}{lcl ll }
+
+\pi(\sigma_b^2|\cdot) & \propto & \left(\sigma_b^2\right)^{-\dfrac{N}{2}}\mbox{exp}\left\{ \dfrac{1}{2\sigma_b^2}\displaystyle\sum_{i=1}^{N} b_i^2\right\}\\ \\
+
+& \sim &  \mathcal{IG} \left( \dfrac{N-2}{2} , \displaystyle\sum_{i=1}^{N}\dfrac{b_i^2}{2} \right)
+
+\end{array}
+\end{eqnarray*}
+\end{small}
+
+Now, by integrating out the random effects $\boldsymbol{b}_i$, we can obtain the following marginal posterior distribution, $\boldsymbol{\theta}'$ = $\mu$, $\sigma_y$, $\sigma_b$.:
+
+\begin{small}
+\begin{eqnarray*}
+\begin{array}{lcl ll }
+\pi(\boldsymbol{\theta}'|\textbf{y}) & \propto &  \displaystyle\int_{\boldsymbol{b}_i} \pi(\textbf{b}_i, \mu, \sigma_y, \sigma_b|\textbf{y}) d\boldsymbol{b}_i \\ \\
+
+& \propto & \displaystyle\prod_{i=1}^{N}\displaystyle\int_{\boldsymbol{b}_i} \left(\dfrac{1}{\sigma_b^2}\right)^{-\frac{N}{2}}\mbox{exp}\left\{ \dfrac{1}{2\sigma_b^2} b_i^2 \right\} \times \\ 
+&  & \times  \left(\dfrac{1}{\sigma_y^2}\right)^{-\frac{n}{2}} \mbox{exp}\left\{ -\dfrac{1}{2\sigma_y^2}\displaystyle\sum_{j=1}^{n}(y_{ij} - (\mu - b_i))^2\right\} d\boldsymbol{b}_i \\\\
+
+& \propto & \displaystyle\prod_{i=1}^{N} \left(\dfrac{1}{\sigma_y^2}\right)^{-\frac{n}{2}} \left(\dfrac{1}{\sigma_b^2}\right)^{-\frac{1}{2}} \mbox{exp}\left\{ -\dfrac{1}{2\sigma_y^2}\displaystyle\sum_{j=1}^{n}(y_{ij} - \mu)^2\right\} \\\\
+
+& & \times \displaystyle\int_{\boldsymbol{b}_i} \mbox{exp}\left\{ \dfrac{1}{2\sigma_b^2} b_i^2 \right\} \times \\ 
+
+&   & \times  \exp\left\{ -\dfrac{1}{2\sigma_y^2}\displaystyle\sum_{j=1}^{n}(y_{ij} - (\mu - b_i))^2\right\} d\boldsymbol{b}_i \\\\
+
+& \propto & \displaystyle\prod_{i=1}^{N} \left(\dfrac{1}{\sigma_y^2}\right)^{-\frac{n}{2}} \left(\dfrac{1}{\sigma_b^2}\right)^{-\frac{1}{2}} \mbox{exp}\left\{ -\dfrac{1}{2\sigma_y^2}\displaystyle\sum_{j=1}^{n}(y_{ij} - \mu)^2\right\} \\\\
+
+& \times &  \bigint_{\boldsymbol{b}_i} \mbox{exp}\left\{ -\dfrac{1}{2} \left[ \dfrac{b_i^2 - 2\displaystyle\sum_{j=1}^{n}(y_{ij} -\mu)b_i \dfrac{\sigma_b^2}{n\sigma_b^2 + \sigma_y^2}}{\dfrac{\sigma_b^2\sigma_y^2}{n\sigma_b^2 + \sigma_y^2}}\right]\right\} d\boldsymbol{b}_i \\\\
+
+\end{array}
+\end{eqnarray*}
+\end{small}
+
+\begin{small}
+\begin{eqnarray*}
+\begin{array}{lcl ll }
+
+
+& \propto & \displaystyle\prod_{i=1}^{N}\left(\dfrac{1}{\sigma_y^2}\right)^{\frac{n}{2}} \left(\dfrac{1}{\sigma_b^2}\right)^{\frac{1}{2}} \left(\dfrac{\sigma_b^2\sigma_y^2}{n\sigma_b^2 + \sigma_y^2}\right)^{-\frac{1}{2}}  \times \\ \\
+
+& & \times \mbox{exp}\left\{ -\dfrac{1}{2\sigma_y^2}\displaystyle\sum_{j=1}^{n}(y_{ij} - \mu)^2\right\} \\\\
+
+& &\times \mbox{exp}\left\{ \left[\displaystyle\sum_{j=1}^{n}(y_{ij} -\mu)  \left(\dfrac{\sigma_b^2}{n\sigma_b^2 + \sigma_y^2}\right) \right]^2 \dfrac{n\sigma_b^2 + \sigma_y^2}{2\sigma_b^2\sigma_y^2}\right\}\\\\
+
+& \propto & \displaystyle\prod_{i=1}^{N}\left(\dfrac{1}{\sigma_y^2}\right)^{\frac{n}{2}} \left(\dfrac{1}{\sigma_b^2}\right)^{\frac{1}{2}} 
+
+\left( \left[\sigma_b^2 + \dfrac{\sigma_y^2}{n}\right] \dfrac{n}{\sigma_b^2 \sigma_y^2} \right)^{-\frac{1}{2}}  \times \\ \\
+
+& & \times \mbox{exp}\left\{ -\dfrac{1}{2\sigma_y^2}\displaystyle\sum_{j=1}^{n}(y_{ij} - \mu)^2\right\} \\\\
+
+&  & \times \mbox{exp}\left\{ \left[\displaystyle\sum_{j=1}^{n}(y_{ij} -\mu)  \left(\dfrac{\sigma_b^2}{n\sigma_b^2 + \sigma_y^2}\right) \right]^2 \dfrac{n\sigma_b^2 + \sigma_y^2}{2\sigma_b^2\sigma_y^2}\right\}\\\\
+
+& \propto & \displaystyle\prod_{i=1}^{N}\left(\dfrac{1}{\sigma_y^2}\right)^{\frac{n-1}{2}} 
+
+\left(\sigma_b^2 + \dfrac{\sigma_y^2}{n}\right)^{-\frac{1}{2}}  \times \\ \\
+
+& & \times \mbox{exp}\left\{ -\dfrac{1}{2\sigma_y^2}\displaystyle\sum_{j=1}^{n}(y_{ij} - \bar{y}_{i\cdot})^2 + n(\bar{y}_{i\cdot}- \mu)^2\right\} \\\\
+
+&  & \times \mbox{exp}\left\{ \dfrac{\left[\displaystyle\sum_{j=1}^{n}(y_{ij} - \bar{y}_{i\cdot} + \bar{y}_{i\cdot}-\mu)^2  \left(\dfrac{\sigma_b^2}{n\sigma_b^2 + \sigma_y^2}\right) \right]^2 }{2\left(\sigma_b^2 + \dfrac{\sigma_y^2}{n}\right)}\right\}\\\\
+
+
+& \propto & \displaystyle\prod_{i=1}^{N}\left(\dfrac{1}{\sigma_y^2}\right)^{\frac{n-1}{2}} 
+
+\left(\sigma_b^2 + \dfrac{\sigma_y^2}{n}\right)^{-\frac{1}{2}}  \times \\ \\
+
+& & \times \mbox{exp}\left\{ -\dfrac{1}{2\sigma_y^2}\displaystyle\sum_{j=1}^{n}S_i\right\} \mbox{exp}\left\{ \dfrac{(\bar{y}_{i\cdot}-\mu)^2 }{2\left(\sigma_b^2 + \dfrac{\sigma_y^2}{n}\right)}\right\}\\\\
+
+& \sim & \displaystyle\prod_{i=1}^{N} \mathcal{G} \left(S_i | \dfrac{n-1}{2}, \dfrac{1}{2\sigma_y^2} \right) \mathcal{N}  \left(\bar{y}_{i\cdot} | \mu, \sqrt[]{\left(\sigma_b^2 + \dfrac{\sigma_y^2}{n}\right)} \right)\\
+
+\end{array}
+\end{eqnarray*}
+\end{small}
+
+Thus, the marginal posterior distribution it is given by the joint distribution of the sample mean between groups having a normal distribution, and the sum of squares a gamma density.
+
+\begin{references}
+{\footnotesize
+\itemsep=3pt
+
+\item Box, G. E. P., \& Tiao, G. C. (1973). Bayesian inference in statistical inference. Adison-Wesley, Reading, Mass.
+
+\item Davies, O. L. (1967), Statistical Methods in Research and Production, third edit ion,
+London: Oliver and Boyd.
+
+\item Gelman, A., Carlin, J. B., Stern, H. S., Dunson, D. B., Vehtari, A., \& Rubin, D. B. (2014). Bayesian data analysis (Vol. 3). Boca Raton, FL: CRC press.
+}
+
+\end{references}
+
+
+\end{document}
+
