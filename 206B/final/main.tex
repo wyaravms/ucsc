@@ -1,0 +1,1150 @@
+\documentclass[a4paper, 11pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[margin=1in]{geometry} 
+\usepackage{amsmath,amsthm,amssymb}
+\usepackage{listings}
+\usepackage{graphicx}
+\usepackage{indentfirst}
+\renewcommand{\baselinestretch}{1}
+\usepackage{subcaption}
+\usepackage{float}
+\graphicspath{ {images/} }
+\usepackage{comment} % enables the use of multi-line comments (\ifx \fi) 
+\usepackage{fullpage} % changes the margin
+
+\begin{document}
+%Header-Make sure you update this information!!!!
+\noindent
+{\Large\textbf{Final Exam} \hfill \\
+AMS 206B \hfill Winter 2018 \\
+Wyara Vanesa Moura e Silva \hfill March 21\\}
+
+\section*{Question 1}
+
+The data is about quality control measurements from 6 machines in a factory. Some summaries of the data will be given.
+
+First, it can noticed by the boxplot in Figure \ref{Fig1}, that the distribution of the machines appear to have different averages for the measures of quality, with some of them having close values. It may be noted that there are some outliers.
+
+\begin{figure}[H]
+\centering
+\caption{Boxplot for the machines data.}
+\label{Fig1}
+\includegraphics[width = 0.5\textwidth, height =0.3\textheight]{boxplot.pdf}
+\end{figure}
+
+Table \ref{tab4} shows the summaries of each machine, and it can be seem that the numbers of machines varies, and machine 1 has the lowest mean, and machine 4 has the highest mean. It is also noticed that machine 4 has the lowest variance and machine 6 has the highest variance.
+
+\begin{table}[H]
+\centering
+\begin{tabular}{lllllll}
+\hline
+& $\theta_1$  & $\theta_2$ & $\theta_3$ & $\theta_4$ & $\theta_5$ & $\theta_6$ \\
+\hline
+$m$ & 9 & 8 & 7 & 6 & 6 & 8 \\
+sample mean & 76.0000     & 105.8750    & 87.7142      & 111.5000     & 90.3333     & 85.8750      \\    
+sample variance & 193.0000 & 80.4107 & 109.2381 &  45.9000 & 93.4666 & 211.5535 \\
+\hline
+\end{tabular}
+\caption{Summaries of measurements for each machine.}
+\label{tab4}
+\end{table}
+
+By the descriptive analysis there are indications that the means between the machines are different. Other types of analysis are then required.
+
+\section*{Question 2}
+
+Model 1:
+\begin{equation*}
+\begin{array}{lcl ll }
+y_{ij}|\theta_i,\sigma^2 & \stackrel{indep}{\sim} & N(\theta_i,\sigma^2) \\ \\
+
+\theta_i | \mu, \tau^2 & \stackrel{iid}{\sim} & N(\mu,\tau^2) \\
+ \end{array}
+\end{equation*}
+
+Assuming that, $\sigma^2|\nu_0, s^2	_0$ $\sim$ IG$(\nu_0/2,s_0^2/2)$, $\mu$ $\sim$ N$(\mu_0,\omega^2)$ and $\tau^2$ $\sim$ IG$(a_\tau, b_\tau)$, where $\nu_0$, $ s^2_0$, $\mu_0$, $\omega^2$, $a_\tau$ and $b_\tau$ are fixed.
+
+\subsection*{(a)} The joint posterior distribution up to proportionality has expression given by:
+
+\begin{equation*}
+\begin{array}{lcl ll }
+\pi(\theta_i, \sigma^2, \mu, \tau^2 |y_{ij}) & = & \displaystyle\prod_{i=1}^{n}\displaystyle\prod_{j=1}^{m_i}\left(\dfrac{1}{2\pi\sigma^2}\right)^{\dfrac{1}{2}}\mbox{exp}\left\{ - \dfrac{1}{2\sigma^2}\displaystyle\sum_{i=1}^{n}\displaystyle\sum_{j=1}^{m_i}(y_{ij} - \theta_i)^2\right\} \times \\ \\
+
+& & \times \displaystyle\prod_{i=1}^{n}\left(\dfrac{1}{2\pi\tau^2}\right)^{\dfrac{1}{2}}\mbox{exp}\left\{ - \dfrac{1}{2\tau^2} 
+\displaystyle\sum_{i=1}^{n} (\theta_i - \mu)^2\right\} \times \\ \\
+
+& & \times \hspace{0.3cm} \dfrac{\left(\dfrac{s_0^2}{2}\right)^{\nu_0/2}}{\Gamma(\nu_0/2)}(\sigma^2)^{-\dfrac{\nu_0}{2}-1} \mbox{exp}\left\{ - \dfrac{s_0^2}{2}\dfrac{1}{\sigma^2}\right\} \times \\ \\
+
+& & \times \hspace{0.3cm}\left(\dfrac{1}{2\pi\omega^2}\right)^{\dfrac{1}{2}}\mbox{exp}\left\{ - \dfrac{(\mu - \mu_0)^2}{2\omega^2}\right\} \times\dfrac{\left(b_\tau\right)^{a_\tau}}{\Gamma(a_\tau)}(\sigma^2)^{-\dfrac{\nu_0}{2}-1} (\tau^2)^{-a_\tau-1} \mbox{exp}\left\{ - b_\tau\dfrac{1}{\tau^2}\right\} \\ \\
+
+\pi(\theta_i, \sigma^2, \mu, \tau^2 |y_{ij}) & \propto & \left(\dfrac{1}{\sigma^2}\right)^{\dfrac{nm}{2}}\mbox{exp}\left\{ - \dfrac{1}{2\sigma^2}\displaystyle\sum_{i=1}^{n}\displaystyle\sum_{j=1}^{m_i}(y_{ij} - \theta_i)^2\right\} \times \\ \\
+
+& & \times \left(\dfrac{1}{\tau^2}\right)^{\dfrac{n}{2}}\mbox{exp}\left\{ - \dfrac{1}{2\tau^2} 
+\displaystyle\sum_{i=1}^{n} (\theta_i - \mu)^2\right\} \times \\ \\
+
+& & \times \hspace{0.3cm}(\sigma^2)^{-\dfrac{\nu_0}{2}-1} \mbox{exp}\left\{ - \dfrac{s_0^2}{2}\dfrac{1}{\sigma^2}\right\} \times \\ \\
+
+& & \times \hspace{0.3cm}\mbox{exp}\left\{ - \dfrac{(\mu - \mu_0)^2}{2\omega^2}\right\} \times (\tau^2)^{-a_\tau-1} \mbox{exp}\left\{ - b_\tau\dfrac{1}{\tau^2}\right\} \\ \\
+
+ \end{array}
+\end{equation*}
+
+\subsection*{(b)}\label{sb} Now, it can be show the full conditionals for all parameters, which are:
+
+\begin{itemize}
+\item For $\theta_i$
+\end{itemize}
+\begin{equation*}
+\begin{array}{lcl ll }
+
+\pi(\theta_i| \sigma^2, \mu, \tau^2, y_{ij})  & \propto & \mbox{exp}\left\{ - \dfrac{1}{2\sigma^2}\displaystyle\sum_{i=1}^{n}\displaystyle\sum_{j=1}^{m_i}(y_{ij} - \theta_i)^2\right\} \mbox{exp}\left\{ - \dfrac{1}{2\tau^2} 
+\displaystyle\sum_{i=1}^{n} (\theta_i - \mu)^2\right\} \\ \\
+
+\end{array}
+\end{equation*}
+
+\begin{equation*}
+\begin{array}{lcl ll }
+
+& \propto & \mbox{exp}\left\{ - \dfrac{1}{2\sigma^2}\displaystyle\sum_{i=1}^{n}\displaystyle\sum_{j=1}^{m_i}(y_{ij}^2 - 2y_{ij}\theta_i + \theta_i^2)\right\} \mbox{exp}\left\{ - \dfrac{1}{2\tau^2} 
+\displaystyle\sum_{i=1}^{n} (\theta_i^2 - 2\theta_i\mu +\mu^2)\right\}  \\ \\
+
+& \propto & \mbox{exp}\left\{ - \dfrac{1}{2\sigma^2}\displaystyle\sum_{i=1}^{n}\displaystyle\sum_{j=1}^{m_i}(- 2y_{ij}\theta_i + \theta_i^2) - \dfrac{1}{2\tau^2} 
+\displaystyle\sum_{i=1}^{n} (\theta_i^2 - 2\theta_i\mu)\right\} \\ \\
+
+& \propto & \mbox{exp}\left\{ - \dfrac{1}{2} \left[ \dfrac{1}{\sigma^2}\displaystyle\sum_{i=1}^{n}\displaystyle\sum_{j=1}^{m_i}(- 2y_{ij}\theta_i + \theta_i^2) - \dfrac{1}{\tau^2} 
+\displaystyle\sum_{i=1}^{n} (\theta_i^2 - 2\theta_i\mu)\right] \right\} \\ \\
+
+& \propto & \mbox{exp}\left\{ - \dfrac{1}{2} \left[ \displaystyle\sum_{i=1}^{n} \theta_i^2  \left( \dfrac{m_i}{\sigma^2} + \dfrac{1}{\tau^2} \right) - 2 \displaystyle\sum_{i=1}^{n} \theta_i  \left( \dfrac{1}{\sigma^2}\displaystyle\sum_{j=1}^{m_i}y_{ij} + \dfrac{\mu}{\tau^2} \right)\right] \right\} \\ \\
+
+& \propto & \mbox{exp}\left\{ - \dfrac{1}{2} \left[ \displaystyle\sum_{i=1}^{n} \theta_i^2 - 2 \displaystyle\sum_{i=1}^{n} \theta_i  \left( \dfrac{\dfrac{1}{\sigma^2}\displaystyle\sum_{j=1}^{m_i}y_{ij} + \dfrac{\mu}{\tau^2}}{ \left( \dfrac{m_i}{\sigma^2} + \dfrac{1}{\tau^2} \right)} \right)\right] \dfrac{1}{\left(\dfrac{m_i}{\sigma^2} + \dfrac{1}{\tau^2} \right)^{-1}} \right\} \\ \\
+
+\end{array}
+\end{equation*}
+
+Which is a kernel of a Normal distribution with the following moments:\\
+\begin{equation*}
+\begin{array}{lcl ll }
+
+\pi(\theta_i| \sigma^2, \mu, \tau^2, y_{ij}) & \sim &  \mbox{N} \left(  \left( \dfrac{\dfrac{1}{\sigma^2}\displaystyle\sum_{j=1}^{m_i}y_{ij} + \dfrac{\mu}{\tau^2}}{ \left( \dfrac{m_i}{\sigma^2} + \dfrac{1}{\tau^2} \right)} \right), \left(\dfrac{m_i}{\sigma^2} + \dfrac{1}{\tau^2} \right)^{-1} \right) \\\\
+
+ \end{array}
+\end{equation*}
+
+\begin{itemize}
+\item For $\sigma^2$
+\end{itemize}
+\begin{equation*}
+\begin{array}{lcl ll }
+
+\pi(\sigma^2|\theta_i, \mu, \tau^2, y_{ij}) & \propto & \left(\sigma^2\right)^{-\dfrac{nm}{2}}\mbox{exp}\left\{ - \dfrac{1}{2\sigma^2}\displaystyle\sum_{i=1}^{n}\displaystyle\sum_{j=1}^{m_i}(y_{ij} - \theta_i)^2\right\} \times \\ \\
+
+& & \times \hspace{0.3cm}(\sigma^2)^{-\dfrac{\nu_0}{2}-1} \mbox{exp}\left\{ - \dfrac{s_0^2}{2}\dfrac{1}{\sigma^2}\right\} \\ \\
+
+ \end{array}
+\end{equation*}
+
+\begin{equation*}
+\begin{array}{lcl ll }
+& \propto & \left(\sigma^2\right)^{-\dfrac{nm}{2}-\dfrac{\nu_0}{2}-1}\mbox{exp}\left\{ - \dfrac{1}{2\sigma^2}\displaystyle\sum_{i=1}^{n}\displaystyle\sum_{j=1}^{m_i}(y_{ij} - \theta_i)^2 - \dfrac{s_0^2}{2}\dfrac{1}{\sigma^2}\right\} \\ \\
+
+& \propto & \left(\sigma^2\right)^{-\left(\dfrac{nm}{2}+\dfrac{\nu_0}{2}\right)-1}\mbox{exp}\left\{ - \dfrac{1}{\sigma^2}\left[\dfrac{1}{2}\displaystyle\sum_{i=1}^{n}\displaystyle\sum_{j=1}^{m_i}(y_{ij} - \theta_i)^2 + \dfrac{s_0^2}{2}\right]\right\} \\ \\
+ \end{array}
+\end{equation*}
+
+Which is a kernel of a Inverse Gamma distribution with the following parameters:
+
+\begin{equation*}
+\begin{array}{lcl ll }
+
+\pi(\sigma^2|\theta_i, \mu, \tau^2, y_{ij}) & \sim &  \mbox{IG} \left( \dfrac{nm}{2}+\dfrac{\nu_0}{2} , \dfrac{1}{2}\displaystyle\sum_{i=1}^{n}\displaystyle\sum_{j=1}^{m_i}(y_{ij} - \theta_i)^2 + \dfrac{s_0^2}{2} \right)  \\\\
+
+ \end{array}
+\end{equation*}
+
+\begin{itemize}
+\item For $\mu$
+\end{itemize}
+\begin{equation*}
+\begin{array}{lcl ll }
+
+\pi(\mu|\theta_i, \sigma^2, \tau^2, y_{ij}) & \propto & \left(\dfrac{1}{\tau^2}\right)^{\dfrac{n}{2}}\mbox{exp}\left\{ - \dfrac{1}{2\tau^2} 
+\displaystyle\sum_{i=1}^{n} (\theta_i - \mu)^2\right\} \mbox{exp}\left\{ - \dfrac{(\mu - \mu_0)^2}{2\omega^2}\right\}  \\ \\
+
+& \propto & \left(\dfrac{1}{\tau^2}\right)^{\dfrac{n}{2}}\mbox{exp}\left\{ - \dfrac{1}{2\tau^2} 
+\displaystyle\sum_{i=1}^{n} (\theta_i^2 - 2\theta_i\mu + \mu^2)\right\} \mbox{exp}\left\{ - \dfrac{(\mu^2 - 2\mu\mu_0 + \mu_0^2)}{2\omega^2}\right\}  \\ \\
+
+& \propto & \left(\dfrac{1}{\tau^2}\right)^{\dfrac{n}{2}}\mbox{exp}\left\{ - \dfrac{1}{2\tau^2} 
+\displaystyle\sum_{i=1}^{n} (- 2\theta_i\mu + \mu^2)\right\} \mbox{exp}\left\{ - \dfrac{(\mu^2 - 2\mu\mu_0)}{2\omega^2}\right\}  \\ \\
+
+& \propto & \mbox{exp}\left\{ - \dfrac{1}{2} \left[ \dfrac{1}{\tau^2} \displaystyle\sum_{i=1}^{n} (- 2\theta_i\mu + \mu^2) + \dfrac{\mu^2 - 2\mu\mu_0}{\omega^2} \right] \right\} \\ \\
+
+& \propto & \mbox{exp}\left\{ - \dfrac{1}{2} \left[ \mu^2 \left( \dfrac{n}{\tau^2} +\dfrac{1}{\omega^2} \right) - 2\mu \left(\dfrac{1}{\tau^2}\displaystyle\sum_{i=1}^{n} \theta_i + \dfrac{\mu_0}{\omega^2} \right) \right] \right\} \\ \\
+
+ \end{array}
+\end{equation*}
+
+
+\begin{equation*}
+\begin{array}{lcl ll }
+
+& \propto & \mbox{exp}\left\{ - \dfrac{1}{2} \left[ \mu^2 - 2\mu \dfrac{ \left(\dfrac{1}{\tau^2}\displaystyle\sum_{i=1}^{n} \theta_i + \dfrac{\mu_0}{\omega^2} \right)}{\left( \dfrac{n}{\tau^2} +\dfrac{1}{\omega^2} \right)} \right] \dfrac{1}{\left( \dfrac{n}{\tau^2} +\dfrac{1}{\omega^2} \right)^{-1}}\right\} \\ \\
+
+ \end{array}
+\end{equation*}
+
+Which is a kernel of a Normal distribution with the following moments:\\
+\begin{equation*}
+\begin{array}{lcl ll }
+
+\pi(\mu|\theta_i, \sigma^2, \tau^2, y_{ij}) & \sim &  \mbox{N} \left( \dfrac{ \left(\dfrac{1}{\tau^2}\displaystyle\sum_{i=1}^{n} \theta_i + \dfrac{\mu_0}{\omega^2} \right)}{\left( \dfrac{n}{\tau^2} +\dfrac{1}{\omega^2} \right)}, \left( \dfrac{n}{\tau^2} +\dfrac{1}{\omega^2} \right)^{-1} \right) \\\\
+
+ \end{array}
+\end{equation*}
+
+
+\begin{itemize}
+\item For $\tau^2$
+\end{itemize}
+\begin{equation*}
+\begin{array}{lcl ll }
+
+\pi(\tau^2| \theta_i, \sigma^2, \mu, y_{ij}) & \propto & \left(\tau^2\right)^{-\dfrac{n}{2}}\mbox{exp}\left\{ - \dfrac{1}{2\tau^2} 
+\displaystyle\sum_{i=1}^{n} (\theta_i - \mu)^2\right\} (\tau^2)^{-a_\tau-1} \mbox{exp}\left\{ - b_\tau\dfrac{1}{\tau^2}\right\} \\ \\
+
+ \end{array}
+\end{equation*}
+
+
+\begin{equation*}
+\begin{array}{lcl ll }
+& \propto & \left(\tau^2\right)^{-\dfrac{n}{2}-a_\tau-1}\mbox{exp}\left\{ - \dfrac{1}{2\tau^2} 
+\displaystyle\sum_{i=1}^{n} (\theta_i - \mu)^2 - b_\tau\dfrac{1}{\tau^2}\right\} \\ \\
+
+& \propto & \left(\tau^2\right)^{-\left(\dfrac{n}{2}+a_\tau\right)-1}\mbox{exp}\left\{ - \dfrac{1}{\tau^2} \left[\dfrac{1}{2}
+\displaystyle\sum_{i=1}^{n} (\theta_i - \mu)^2 + b_\tau\right]\right\} \\ \\
+
+ \end{array}
+\end{equation*}
+
+Which is a kernel of a Inverse Gamma distribution with the following parameters:
+
+\begin{equation*}
+\begin{array}{lcl ll }
+
+\pi(\tau^2| \theta_i, \sigma^2, \mu, y_{ij}) & \sim &  \mbox{IG} \left( \dfrac{n}{2}+a_\tau , \dfrac{1}{2}
+\displaystyle\sum_{i=1}^{n} (\theta_i - \mu)^2 + b_\tau \right)  \\\\
+
+ \end{array}
+\end{equation*}
+
+\subsection*{(c)}
+
+The values for the fixed hyperparameters were chosen to be non-informative prior as possible. See Table \ref{tab1}.
+
+\begin{table}[H]
+\centering
+
+\begin{tabular}{llllll}
+\hline	
+$\nu_0$  & $s_0^2$ & $\mu_0$ & $\omega^2$ & $a_\tau$ & $b_\tau$ \\
+\hline
+6      & 3    & 90      & $100$     & 3       & 3       \\    
+\hline
+\end{tabular}
+\caption{Values for the hyperparameters for Model 1.}
+\label{tab1}
+\end{table}
+
+For the MCMC was used the algorithm of Gibbs sampling using the conditional posterior distribution found in letter (b). In Table \ref{tab2} are given the summary for the posterior distribution of the parameters $\{ \theta_i, \sigma^2, \mu, \tau^2\}$, the inferences are posterior mean and credible intervals.
+
+\begin{table}[H]
+\centering
+\begin{tabular}{llllllllll}
+\hline
+& $\theta_1$ & $\theta_2$ & $\theta_3$  \\
+\hline
+post. mean & 83.1194  & 99.3654  &  89.7139     \\
+95\% CI & (73.2861, 93.9509) &  (88.9505, 109.2171) & (82.2835, 96.3128)\\ 
+\hline
+& $\theta_4$ & $\theta_5$ &  $\theta_6$ \\
+\hline
+post. mean  & 101.5591 & 91.1543 &  88.6897 \\
+95\% CI & (88.9387, 114.0836)  & (84.0062, 98.1978) & (81.0594, 95.3112) \\ 
+\hline
+& $\sigma^2$ & $\mu$      & $\tau^2$ \\
+\hline
+post. mean & 158.1364   & 92.0962   & 42.0881     \\  
+95\% CI & (82.5014, 304.1111) & (86.0684, 98.1725) &  (0.6368, 150.9656) & \\
+\hline
+\end{tabular}
+\caption{Summary of posterior inference on parameters for the Model 1.}
+\label{tab2}
+\end{table}
+
+\subsection*{(d)} Now it will compared the results of the posterior estimates of $\theta_i$ and $\sigma^2$ with the sample estimates.
+
+\begin{table}[H]
+\centering
+\begin{tabular}{lllllll}
+\hline
+& $\theta_1$  & $\theta_2$ & $\theta_3$ & $\theta_4$ & $\theta_5$ & $\theta_6$ \\
+\hline
+sample mean & 76.0000     & 105.8750    & 87.7142      & 111.5000     & 90.3333     & 85.8750      \\    
+\hline
+sample variance & 193.0000 & 80.4107 & 109.2381 &  45.9000 & 93.4666 & 211.5535 \\
+\hline
+\end{tabular}
+\caption{Comparison sample mean and sample variance (machine specified).}
+\label{tab3}
+\end{table}
+
+The results for the sample means (Table \ref{tab3}) are close to the values found for the posterior mean (Table \ref{tab2}), with the specific values within the credibility intervals. Regarding the overall sample variance it was get $\sigma^2$ = 267.6845, this value not being within the credibility interval for $\sigma^2$.
+
+\section*{Question 3}
+Model 2:
+\begin{equation*}
+\begin{array}{lcl ll }
+y_{ij}|\theta_i,\sigma_i^2 & \stackrel{indep}{\sim} & N(\theta_i,\sigma_i^2) \\ \\
+
+\theta_i | \mu, \tau^2 & \stackrel{iid}{\sim} & N(\mu,\tau^2) \\
+ \end{array}
+\end{equation*}
+
+Assuming that, $\sigma_i^2|\nu_0, s^2	_0$ $\sim$ IG$(\nu_0/2,s_0^2/2)$, $s_0^2$ $\sim$ Gamma$(a_s,b_s)$ $\mu$ $\sim$ N$(\mu_0,\omega^2)$ and $\tau^2$ $\sim$ IG$(a_\tau, b_\tau)$, where $\nu_0$, $a_s$, $b_s$, $\mu_0$, $\omega^2$, $a_\tau$ and $b_\tau$ are fixed.
+
+\subsection*{(a)} The joint posterior distribution up to proportionality has expression given by:
+
+\begin{equation*}
+\begin{array}{lcl ll }
+
+\pi(\theta_i, \sigma_i^2, \mu, \tau^2 |y_{ij}) & = & \displaystyle\prod_{i=1}^{n}\displaystyle\prod_{j=1}^{m_i}\left(\dfrac{1}{2\pi\sigma_i^2}\right)^{\dfrac{1}{2}}\mbox{exp}\left\{ - \dfrac{1}{2\sigma_i^2}\displaystyle\sum_{i=1}^{n}\displaystyle\sum_{j=1}^{m_i}(y_{ij} - \theta_i)^2\right\} \times \\ \\
+
+& & \times \displaystyle\prod_{i=1}^{n}\left(\dfrac{1}{2\pi\tau^2}\right)^{\dfrac{1}{2}}\mbox{exp}\left\{ - \dfrac{1}{2\tau^2} 
+\displaystyle\sum_{i=1}^{n} (\theta_i - \mu)^2\right\} \times \\ \\
+
+& & \times \hspace{0.3cm} \displaystyle\prod_{i=1}^{n}\dfrac{\left(\dfrac{s_0^2}{2}\right)^{\nu_0/2}}{\Gamma(\nu_0/2)}(\sigma_i^2)^{-\dfrac{\nu_0}{2}-1} \mbox{exp}\left\{ - \dfrac{s_0^2}{2}\dfrac{1}{\sigma_i^2}\right\} \times \\ \\
+
+& & \times \hspace{0.3cm}\left(\dfrac{1}{2\pi\omega^2}\right)^{\dfrac{1}{2}}\mbox{exp}\left\{ - \dfrac{(\mu - \mu_0)^2}{2\omega^2}\right\} \times\dfrac{\left(b_\tau\right)^{a_\tau}}{\Gamma(a_\tau)}(\sigma^2)^{-\dfrac{\nu_0}{2}-1} (\tau^2)^{-a_\tau-1} \mbox{exp}\left\{ - b_\tau\dfrac{1}{\tau^2}\right\} \\ \\
+
+
+ \end{array}
+\end{equation*}
+
+\begin{equation*}
+\begin{array}{lcl ll }
+
+\pi(\theta_i, \sigma_i^2, s_0^2, \mu, \tau^2 |y_{ij}) & \propto & \displaystyle\prod_{i=1}^{n}\left(\dfrac{1}{\sigma_i^2}\right)^{\dfrac{m_i}{2}}\mbox{exp}\left\{ - \displaystyle\sum_{i=1}^{n}\dfrac{1}{2\sigma_i^2}\displaystyle\sum_{j=1}^{m_i}(y_{ij} - \theta_i)^2\right\} \times \\ \\
+
+& & \times \left(\dfrac{1}{\tau^2}\right)^{\dfrac{n}{2}}\mbox{exp}\left\{ - \dfrac{1}{2\tau^2} 
+\displaystyle\sum_{i=1}^{n} (\theta_i - \mu)^2\right\} \times \\ \\
+
+& & \times \hspace{0.3cm}\displaystyle\prod_{i=1}^{n}(\sigma_i^2)^{-\dfrac{\nu_0}{2}-1} \mbox{exp}\left\{ - \dfrac{s_0^2}{2}\displaystyle\sum_{i=1}^{n}\dfrac{1}{\sigma_i^2}\right\} \times \\ \\
+
+& & \times \hspace{0.3cm}(s_0^2)^{a_s-1} \mbox{exp}\left\{ - s_0^2 b_s \right\} \times \\ \\
+
+& & \times \hspace{0.3cm}\mbox{exp}\left\{ - \dfrac{(\mu - \mu_0)^2}{2\omega^2}\right\} \times (\tau^2)^{-a_\tau-1} \mbox{exp}\left\{ - b_\tau\dfrac{1}{\tau^2}\right\} \\ \\
+
+ \end{array}
+\end{equation*}
+
+\subsection*{(b)} Now, it can be show the full conditionals for all parameters, which are:
+
+\begin{itemize}
+\item For $\theta_i$
+\end{itemize}
+\begin{equation*}
+\begin{array}{lcl ll }
+
+\pi(\theta_i| \sigma_i^2, s_0^2, \mu, \tau^2, y_{ij}) & \propto & \mbox{exp}\left\{ - \displaystyle\sum_{i=1}^{n}\dfrac{1}{2\sigma_i^2}\displaystyle\sum_{j=1}^{m_i}(y_{ij} - \theta_i)^2\right\} \mbox{exp}\left\{ - \dfrac{1}{2\tau^2} 
+\displaystyle\sum_{i=1}^{n} (\theta_i - \mu)^2\right\} \\ \\
+
+& \propto & \mbox{exp}\left\{ - \displaystyle\sum_{i=1}^{n}\dfrac{1}{2\sigma_i^2}\displaystyle\sum_{j=1}^{m_i}(y_{ij}^2 - 2y_{ij}\theta_i + \theta_i^2)\right\} \mbox{exp}\left\{ - \dfrac{1}{2\tau^2} 
+\displaystyle\sum_{i=1}^{n} (\theta_i^2 - 2\theta_i\mu +\mu^2)\right\}  \\ \\
+
+& \propto & \mbox{exp}\left\{ - \displaystyle\sum_{i=1}^{n}\dfrac{1}{2\sigma_i^2}\displaystyle\sum_{j=1}^{m_i}(- 2y_{ij}\theta_i + \theta_i^2) - \dfrac{1}{2\tau^2} 
+\displaystyle\sum_{i=1}^{n} (\theta_i^2 - 2\theta_i\mu)\right\} \\ \\
+
+& \propto & \mbox{exp}\left\{ - \dfrac{1}{2} \left[ \displaystyle\sum_{i=1}^{n}\dfrac{1}{\sigma_i^2}\displaystyle\sum_{j=1}^{m_i}(- 2y_{ij}\theta_i + \theta_i^2) - \dfrac{1}{\tau^2} 
+\displaystyle\sum_{i=1}^{n} (\theta_i^2 - 2\theta_i\mu)\right] \right\} \\ \\
+
+& \propto & \mbox{exp}\left\{ - \dfrac{1}{2} \left[ \displaystyle\sum_{i=1}^{n} \theta_i^2  \left( \dfrac{m_i}{\sigma_i^2} + \dfrac{1}{\tau^2} \right) - 2 \displaystyle\sum_{i=1}^{n} \theta_i  \left( \dfrac{1}{\sigma_i^2}\displaystyle\sum_{j=1}^{m_i}y_{ij} + \dfrac{\mu}{\tau^2} \right)\right] \right\} \\ \\
+
+& \propto & \mbox{exp}\left\{ - \dfrac{1}{2} \left[ \displaystyle\sum_{i=1}^{n} \theta_i^2 - 2 \displaystyle\sum_{i=1}^{n} \theta_i  \left( \dfrac{\dfrac{1}{\sigma_i^2}\displaystyle\sum_{j=1}^{m_i}y_{ij} + \dfrac{\mu}{\tau^2}}{ \left( \dfrac{m_i}{\sigma_i^2} + \dfrac{1}{\tau^2} \right)} \right)\right] \dfrac{1}{\left(\dfrac{m_i}{\sigma_i^2} + \dfrac{1}{\tau^2} \right)^{-1}} \right\} \\ \\
+
+\end{array}
+\end{equation*}
+
+Which is a kernel of a Normal distribution with the following moments:\\
+\begin{equation*}
+\begin{array}{lcl ll }
+
+\pi(\theta_i| \sigma_i^2, s_0^2, \mu, \tau^2, y_{ij}) & \sim &  \mbox{N} \left(  \left( \dfrac{\dfrac{1}{\sigma_i^2}\displaystyle\sum_{j=1}^{m_i}y_{ij} + \dfrac{\mu}{\tau^2}}{ \left( \dfrac{m_i}{\sigma_i^2} + \dfrac{1}{\tau^2} \right)} \right), \left(\dfrac{m_i}{\sigma_i^2} + \dfrac{1}{\tau^2} \right)^{-1} \right) \\\\
+
+ \end{array}
+\end{equation*}
+
+
+\begin{itemize}
+\item For $\sigma^2$
+\end{itemize}
+\begin{equation*}
+\begin{array}{lcl ll }
+
+\pi(\sigma_i^2|\theta_i, s_0^2, \mu, \tau^2 |y_{ij}) & \propto & \displaystyle\prod_{i=1}^{n}\left(\sigma_i^2\right)^{-\dfrac{m_i}{2}}\mbox{exp}\left\{ - \displaystyle\sum_{i=1}^{n}\dfrac{1}{2\sigma_i^2}\displaystyle\sum_{j=1}^{m_i}(y_{ij} - \theta_i)^2\right\} \times \\ \\
+
+& & \times \hspace{0.3cm}\displaystyle\prod_{i=1}^{n}(\sigma_i^2)^{-\dfrac{\nu_0}{2}-1} \mbox{exp}\left\{ - \dfrac{s_0^2}{2}\displaystyle\sum_{i=1}^{n}\dfrac{1}{\sigma_i^2}\right\} \times \\ \\
+
+& \propto & \displaystyle\prod_{i=1}^{n}\left(\sigma_i^2\right)^{-\dfrac{m_i}{2}-\dfrac{\nu_0}{2}-1}\mbox{exp}\left\{ - \displaystyle\sum_{i=1}^{n}\dfrac{1}{2\sigma_i^2}\displaystyle\sum_{j=1}^{m_i}(y_{ij} - \theta_i)^2 - \dfrac{s_0^2}{2}\dfrac{1}{\sigma_i^2}\right\} \\ \\
+
+& \propto & \displaystyle\prod_{i=1}^{n}\left(\sigma_i^2\right)^{-\left(\dfrac{m_i}{2}+\dfrac{\nu_0}{2}\right)-1}\mbox{exp}\left\{ - \displaystyle\sum_{i=1}^{n}\dfrac{1}{\sigma_i^2}\left[\dfrac{1}{2}\displaystyle\sum_{j=1}^{m_i}(y_{ij} - \theta_i)^2 + \dfrac{s_0^2}{2}\right]\right\} \\ \\
+ \end{array}
+\end{equation*}
+
+Which is a kernel of a Inverse Gamma distribution with the following parameters:
+
+\begin{equation*}
+\begin{array}{lcl ll }
+
+\pi(\sigma_i^2|\theta_i, \mu, \tau^2, y_{ij}) & \sim &  \mbox{IG} \left( \dfrac{m_i}{2}+\dfrac{\nu_0}{2} , \dfrac{1}{2}\displaystyle\sum_{j=1}^{m_i}(y_{ij} - \theta_i)^2 + \dfrac{s_0^2}{2} \right)  \\\\
+
+ \end{array}
+\end{equation*}
+
+
+\begin{itemize}
+\item For $s_0^2$
+\end{itemize}
+\begin{equation*}
+\begin{array}{lcl ll }
+
+\pi(s_0^2|\theta_i, \sigma_i^2 , \mu, \tau^2, y_{ij}) & \propto & \mbox{exp}\left\{ - \dfrac{s_0^2}{2}\displaystyle\sum_{i=1}^{n}\dfrac{1}{\sigma_i^2}\right\} (s_0^2)^{a_s-1} \mbox{exp}\left\{ - s_0^2 b_s \right\} \\ \\
+
+& \propto & (s_0^2)^{a_s-1} \mbox{exp}\left\{ - s_0^2\left( \displaystyle\sum_{i=1}^{n}\dfrac{1}{2\sigma_i^2} + b_s \right)\right\}  \\ \\
+ \end{array}
+\end{equation*}
+
+Which is a kernel of a Gamma distribution with the following parameters:
+
+\begin{equation*}
+\begin{array}{lcl ll }
+
+\pi(\tau^2| \theta_i, \sigma^2, \mu, y_{ij}) & \sim &  \mbox{Gamma} \left( a_s , \left( \displaystyle\sum_{i=1}^{n}\dfrac{1}{2\sigma_i^2} + b_s \right) \right)  \\\\
+
+ \end{array}
+\end{equation*}
+
+\begin{itemize}
+\item For $\mu$
+\end{itemize}
+\begin{equation*}
+\begin{array}{lcl ll }
+
+\pi( \mu|\theta_i, \sigma_i^2, s_0^2, \tau^2, y_{ij}) & \propto & \left(\dfrac{1}{\tau^2}\right)^{\dfrac{n}{2}}\mbox{exp}\left\{ - \dfrac{1}{2\tau^2} 
+\displaystyle\sum_{i=1}^{n} (\theta_i - \mu)^2\right\}  \hspace{0.3cm}\mbox{exp}\left\{ - \dfrac{(\mu - \mu_0)^2}{2\omega^2}\right\} \\ \\
+
+& \propto & \left(\dfrac{1}{\tau^2}\right)^{\dfrac{n}{2}}\mbox{exp}\left\{ - \dfrac{1}{2\tau^2} 
+\displaystyle\sum_{i=1}^{n} (\theta_i^2 - 2\theta_i\mu + \mu^2)\right\} \mbox{exp}\left\{ - \dfrac{(\mu^2 - 2\mu\mu_0 + \mu_0^2)}{2\omega^2}\right\}  \\ \\
+
+& \propto & \left(\dfrac{1}{\tau^2}\right)^{\dfrac{n}{2}}\mbox{exp}\left\{ - \dfrac{1}{2\tau^2} 
+\displaystyle\sum_{i=1}^{n} (- 2\theta_i\mu + \mu^2)\right\} \mbox{exp}\left\{ - \dfrac{(\mu^2 - 2\mu\mu_0)}{2\omega^2}\right\}  \\ \\
+
+& \propto & \mbox{exp}\left\{ - \dfrac{1}{2} \left[ \dfrac{1}{\tau^2} \displaystyle\sum_{i=1}^{n} (- 2\theta_i\mu + \mu^2) + \dfrac{\mu^2 - 2\mu\mu_0}{\omega^2} \right] \right\} \\ \\
+
+& \propto & \mbox{exp}\left\{ - \dfrac{1}{2} \left[ \mu^2 \left( \dfrac{n}{\tau^2} +\dfrac{1}{\omega^2} \right) - 2\mu \left(\dfrac{1}{\tau^2}\displaystyle\sum_{i=1}^{n} \theta_i + \dfrac{\mu_0}{\omega^2} \right) \right] \right\} \\ \\
+
+& \propto & \mbox{exp}\left\{ - \dfrac{1}{2} \left[ \mu^2 - 2\mu \dfrac{ \left(\dfrac{1}{\tau^2}\displaystyle\sum_{i=1}^{n} \theta_i + \dfrac{\mu_0}{\omega^2} \right)}{\left( \dfrac{n}{\tau^2} +\dfrac{1}{\omega^2} \right)} \right] \dfrac{1}{\left( \dfrac{n}{\tau^2} +\dfrac{1}{\omega^2} \right)^{-1}}\right\} \\ \\
+
+ \end{array}
+\end{equation*}
+
+
+Which is a kernel of a Normal distribution with the following moments:\\
+\begin{equation*}
+\begin{array}{lcl ll }
+
+\pi(\mu|\theta_i, \sigma^2, s_0^2, \tau^2, y_{ij}) & \sim &  \mbox{N} \left( \dfrac{ \left(\dfrac{1}{\tau^2}\displaystyle\sum_{i=1}^{n} \theta_i + \dfrac{\mu_0}{\omega^2} \right)}{\left( \dfrac{n}{\tau^2} +\dfrac{1}{\omega^2} \right)}, \left( \dfrac{n}{\tau^2} +\dfrac{1}{\omega^2} \right)^{-1} \right) \\\\
+
+ \end{array}
+\end{equation*}
+
+\begin{itemize}
+\item For $\tau^2$
+\end{itemize}
+\begin{equation*}
+\begin{array}{lcl ll }
+
+\pi(\tau^2 |\theta_i, \sigma_i^2, s_0^2, \mu, y_{ij}) & \propto & \left(\dfrac{1}{\tau^2}\right)^{\dfrac{n}{2}}\mbox{exp}\left\{ - \dfrac{1}{2\tau^2} 
+\displaystyle\sum_{i=1}^{n} (\theta_i - \mu)^2\right\} (\tau^2)^{-a_\tau-1} \mbox{exp}\left\{ - b_\tau\dfrac{1}{\tau^2}\right\} \\ \\
+
+& \propto & \left(\tau^2\right)^{-\dfrac{n}{2}-a_\tau-1}\mbox{exp}\left\{ - \dfrac{1}{2\tau^2} 
+\displaystyle\sum_{i=1}^{n} (\theta_i - \mu)^2 - b_\tau\dfrac{1}{\tau^2}\right\} \\ \\
+
+& \propto & \left(\tau^2\right)^{-\left(\dfrac{n}{2}+a_\tau\right)-1}\mbox{exp}\left\{ - \dfrac{1}{\tau^2} \left[\dfrac{1}{2}
+\displaystyle\sum_{i=1}^{n} (\theta_i - \mu)^2 + b_\tau\right]\right\} \\ \\
+
+ \end{array}
+\end{equation*}
+
+Which is a kernel of a Inverse Gamma distribution with the following parameters:
+
+\begin{equation*}
+\begin{array}{lcl ll }
+
+\pi(\tau^2| \theta_i, \sigma^2, s_0^2, \mu, y_{ij}) & \sim &  \mbox{IG} \left( \dfrac{n}{2}+a_\tau , \dfrac{1}{2}
+\displaystyle\sum_{i=1}^{n} (\theta_i - \mu)^2 + b_\tau \right)  \\\\
+
+ \end{array}
+\end{equation*}
+
+\subsection*{(c)}
+
+The values for the fixed hyperparameters were chosen to be non-informative prior as possible See Table \ref{m2t1}.
+
+\begin{table}[H]
+\centering
+
+\begin{tabular}{lllllllll}
+\hline
+$\nu_0$  & $s_0^2$ & $\mu_0$ & $\omega^2$ & $a_\tau$ & $b_\tau$ & $a_\tau$ & $b_\tau$ \\
+
+\hline
+6      & 3    & 90      & 100     & 3      & 3     & 3    & 3          
+       \\    
+\hline
+\end{tabular}
+\caption{Values for the hyperparameters for Model 2.}
+\label{m2t1}
+\end{table}
+
+For the MCMC was used the algorithm of Gibbs sampling using the conditional posterior distribution found in letter (b). In Table \ref{tabm2} are given the summary for the posterior distribution of the parameters $\{ \theta_i, \sigma_i^2, \mu, \tau^2\}$, the inferences are posterior mean and credible intervals.
+
+
+\begin{table}[H]
+\centering
+\begin{tabular}{llllllllll}
+\hline
+& $\theta_1$ & $\theta_2$ & $\theta_3$  \\
+\hline
+post. mean & 79.1830   & 104.7009  & 88.3919   \\
+95\% CI & (72.1257, 87.3549) &  (99.4259, 109.4951) & (82.7437, 94.2251)\\ 
+\hline
+& $\theta_4$ & $\theta_5$ &  $\theta_6$ \\
+\hline
+post. mean  & 110.2361  & 90.6326 &  87.3059 \\
+95\% CI  & (105.1868, 114.4287) 	& (85.1903, 96.2457) & (79.9689, 94.7887) \\ 
+\hline
+& $\sigma_1$ & $\sigma_2$ & $\sigma_3$   \\
+\hline
+post. mean & 136.7588    & 52.8705  & 66.0206    \\
+95\% CI & (61.6617, 300.0546) &  (23.3767, 118.2893) & (28.4260, 150.2813) \\ 
+\hline
+& $\sigma_4$ & $\sigma_5$ &  $\sigma_6$ \\
+\hline
+post. mean & 27.9416  & 52.34551 &  135.4606 \\
+95\% CI & (11.0442, 68.9796) & (21.4208, 121.8862) & (60.8871, 293.5781) \\ 
+\hline
+& $\mu$      & $\tau^2$ \\
+\hline
+post. mean &  93.0143    & 80.2619      \\  
+95\% CI & (85.6112, 100.0047) &  (28.0964, 200.0602) & \\
+\hline
+\end{tabular}
+\caption{Summary of posterior inference on parameters for the Model 2.}
+\label{tabm2}
+\end{table}
+
+\subsection*{(d)} Now it will compared the results of the posterior estimates of $\theta_i$ and $\sigma^2$ with the sample estimates.
+
+\begin{table}[H]
+\centering
+\begin{tabular}{lllllll}
+\hline
+& $\theta_1$  & $\theta_2$ & $\theta_3$ & $\theta_4$ & $\theta_5$ & $\theta_6$ \\
+\hline
+sample mean & 76.0000     & 105.8750    & 87.7142      & 111.5000     & 90.3333     & 85.8750      \\    
+\hline
+sample variance & 193.0000 & 80.4107 & 109.2381 &  45.9000 & 93.4666 & 211.5535 \\
+\hline
+\end{tabular}
+\caption{Comparison sample mean and sample variance (machine specified).}
+\label{tab3m2}
+\end{table}
+
+The results for the sample means and sample variance (Table \ref{tab3m2}) are close to the values found for the posterior mean (Table \ref{tabm2}) for the parameters, with the specific values within the credibility intervals. 
+
+
+
+\section*{Question 4}
+
+Evaluating the results in Table \ref{tab2} and \ref{tabm2} for the posterior for each parameter that: Model 1 - \{$\theta_1, \sigma^2, \mu$ and $\tau^2$\} and for Model 2 \{$\theta_1, \sigma_i^2, \mu$ and $\tau^2$. \} The results when it is used a different prior for the variance for each $\theta_i$ (for each machine) the posterior mean seem to be closer to the true values for $\theta_i$ (for each machine). In Model 1 the the credibility interval for the variance $\sigma^2$ does not contain the true value. Nevertheless, in Model 2 the posterior mean for the variances $\sigma_i^2$ also are closer to the true values.
+
+However, it is necessary to carry out a comparison test between models in order to check more effectively the best one. Therefore, it was perform the deviance information criterion (DIC) which is a criterion that use the information from the posterior distribution of the parameters.
+
+\begin{table}[H]
+\caption{Criterion values for the model comparison.}\label{criter}
+\centering
+\begin{tabular}{llllllcc}
+\hline
+Criterion & & Model 1 & Model 2 \\
+\hline
+
+DIC & & 423.9719 & 365.8499  \\
+& Goodness of Fit &  349.1356 & 344.1599 \\
+& Effective Size  & 74.8363 & 21.6900\\
+\hline
+\end{tabular}
+\end{table}
+
+Then, we can notice that this criteria favor Model 2, but if we evaluate the goodness of fit, it can be seen that it favor Model 1, and for the Effective size (penalty) Model 2 has the lower value. 
+
+\section*{Question 5}
+
+It will be show the histogram for each request part.
+
+\begin{itemize}
+\item (i) The posterior distribution of the mean of the quality measurements of the sixth machine.
+\end{itemize}
+
+\begin{figure}[H]
+\centering
+\caption{Posterior distribution of the mean for sixth machine in both models.}
+\label{Fig2}
+\includegraphics[width = 0.7\textwidth, height =0.3\textheight]{posteMSM.pdf}
+\end{figure}
+
+\begin{itemize}
+\item (ii) The predictive distribution for another quality measurements of the sixth machine.
+\end{itemize}
+
+\begin{figure}[H]
+\centering
+\caption{Posterior distribution of the mean for sixth machine in both models.}
+\label{Fig3}
+\includegraphics[width = 0.7\textwidth, height =0.3\textheight]{predSM.pdf}
+\end{figure}
+
+\begin{itemize}
+\item (iii) The predictive distribution of the mean of the quality measurements of the seventh machine.
+\end{itemize}
+
+\begin{figure}[H]
+\centering
+\caption{Posterior distribution of the mean for seventh machine in both models.}
+\label{Fig3}
+\includegraphics[width = 0.7\textwidth, height =0.3\textheight]{preSEM.pdf}
+\end{figure}
+
+The distributions appear to have the similar behavior under the models.
+
+%\begin{itemize}
+%\item (iii)
+%\end{itemize}
+
+\newpage
+\section*{R Code}
+
+See below all the R Code used to perform the analysis.
+
+\begin{verbatim}
+
+
+rm(list=ls(all=TRUE))
+library(dplyr)
+
+setwd("C:\\Users\\WYARAVMS\\Google Drive\\phd-ucsc\\winter-2018\\ams-206b\\final")
+
+load("Machine1.RData")
+
+y<- Machine
+y<-(as.data.frame(y))
+
+# some summaries for sample mean and sample variance
+aggregate(y, by=list(y$machine), FUN=mean, na.rm=TRUE)
+aggregate(y, by=list(y$machine), FUN=var, na.rm=TRUE)
+
+# boxplot graph
+boxplot(measurements ~ machine, main="Quality control measurements", xlab="Machines")
+
+n <- 6
+mm <- nrow(y)
+
+# number of each measurement
+m1=9; m2=8; m3=7; m4=6;
+m5=6; m6=8;
+
+m <- c(m1,m2,m3,m4,m5,m6)
+
+# Question 2
+# (c)
+
+#Gibbs Sampling
+
+## functions to sample each parameter from its full conditionals
+
+### update theta_i
+fn_update_theta <- function(y, m, mu, sig2, tau2)
+{
+  theta<-NULL
+  for(j in 1:length(m))
+  {
+    theta[j] <- rnorm(1, (sum(y$measurements[y$machine==j])/sig2 +
+    mu/tau2)/((m[j]/sig2)+(1/tau2)), sqrt(1/((m[j]/sig2)+(1/tau2))))
+  }
+  return(theta)
+}
+
+## update sig2
+fn_update_sig2 <- function(mm, v0, s0, y_theta_sq)
+{
+  sig2 <- 1.0/rgamma(1, (mm/2)+(v0/2), (y_theta_sq)/2 + (s0^2/2))  ## mean a/b
+  return(sig2)
+  
+}
+
+## udpate mu
+fn_update_mu <- function(theta_s, tau2, mu0, omega2, n)
+{
+  va <- 1/(n/tau2 + 1/omega2)
+  mme <- va*((theta_s/tau2) + (mu0/omega2))
+  
+  mu <- rnorm(1, mme, sqrt(va))
+  return(mu)
+  
+}
+
+## update tau2
+fn_update_tau2 <- function(n, at, y_theta_mu_sq, bt)
+{
+  tau2 <- 1.0/rgamma(1, (n/2)+at, y_theta_mu_sq/2 + bt)
+  return(tau2)
+  
+}
+
+# hyperparamenters generating higher variance on the distribution of the priors,
+# being so a vague prior
+
+## hyperparameter
+hyper <- NULL
+hyper$v0 <- 6
+hyper$s0 <- 3
+
+hyper$mu0 <- 90
+hyper$omega2 <- 100
+
+hyper$at <- 3
+hyper$bt <- 3
+
+## initial values
+par_sam <- NULL
+par_sam$theta <- rep(mean(y$measurements), n)
+par_sam$sig2 <- 10^3
+par_sam$mu <- 90
+par_sam$tau <- 10^3
+
+## variables for the MCMC
+ns <- 40000
+
+## save simulated para
+MCMC_sam_M1 <- NULL
+MCMC_sam_M1$theta <- array(NA, dim=c(n, ns))
+MCMC_sam_M1$sig2 <- rep(NA, ns)
+MCMC_sam_M1$mu <- rep(NA, ns)
+MCMC_sam_M1$tau <- rep(NA, ns)
+
+## MCMC modeling
+
+for(i_iter in 1:ns)
+{
+  if((i_iter%%1000)==0)
+  {
+    print(paste("i.iter=", i_iter))
+    print(date())
+  }
+  
+  ## udpate theta
+  par_sam$theta <- fn_update_theta(y, m, par_sam$mu, par_sam$sig2, par_sam$tau)
+  
+  #theta_vector <- function(par_theta,m){
+    for(i in 1:length(m)){
+      if(i==1){
+        par_sam$theta_list<-rep(par_sam$theta[i],m[i])
+        } else{
+      p_the <- rep(par_sam$theta[i],m[i])
+      par_sam$theta_list<-c(par_sam$theta_list,p_the)}
+    }
+    #return()}
+
+  y$theta_list <- par_sam$theta_list
+  #sum_dif <- sapply(y$machine, function(machine) { 
+  y$measurements[y$machine==machine]-par_sam$theta } )
+  ## update sig2
+  par_sam$sig2 <- fn_update_sig2(mm, hyper$v0, hyper$s0, 
+  (sum((y$measurements-y$theta_list)^2)))
+  
+  ## udpate mu
+  par_sam$mu <- fn_update_mu(sum(par_sam$theta), par_sam$tau, hyper$mu0, hyper$omega2, 
+  n)
+  
+  ## update tau2
+  par_sam$tau <- fn_update_tau2(n, hyper$at,  sum((par_sam$theta - par_sam$mu)^2), 
+  hyper$bt)
+  
+  ## save cur_sam
+  MCMC_sam_M1$theta[,i_iter] <- par_sam$theta
+  MCMC_sam_M1$sig2[i_iter] <- par_sam$sig2
+  MCMC_sam_M1$mu[i_iter] <- par_sam$mu
+  MCMC_sam_M1$tau[i_iter] <- par_sam$tau
+    
+}
+
+n_bur <- 1000
+thin <- 3
+
+#posterior mean for the parameters
+apply(MCMC_sam_M1$theta[,seq(n_bur+1, ns,by=thin)],1,mean)
+
+mean(MCMC_sam_M1$sig2[seq(n_bur+1, ns,by=thin)])
+mean(MCMC_sam_M1$mu[seq(n_bur+1, ns,by=thin)])
+mean(MCMC_sam_M1$tau[seq(n_bur+1, ns,by=thin)])
+
+# credibility intervals for the parameters
+apply(MCMC_sam_M1$theta[,seq(n_bur+1,ns,by=thin)], 1, quantile, probs=c(0.025, 0.975))
+
+quantile(MCMC_sam_M1$sig2[seq(n_bur+1, ns,by=thin)], probs=c(0.025, 0.975))
+quantile(MCMC_sam_M1$mu[seq(n_bur+1, ns,by=thin)], probs=c(0.025, 0.975))
+quantile(MCMC_sam_M1$tau[seq(n_bur+1, ns,by=thin)], probs=c(0.025, 0.975))
+
+# Question 3
+
+rm(list=setdiff(ls(), "MCMC_sam_M1"))
+library(dplyr)
+
+setwd("C:\\Users\\WYARAVMS\\Google Drive\\phd-ucsc\\winter-2018\\ams-206b\\final")
+
+load("Machine1.RData")
+
+y<- Machine
+y<-(as.data.frame(y))
+
+n <- 6
+mm <- nrow(y)
+
+# number of each measurement
+m1=9; m2=8; m3=7; m4=6;
+m5=6; m6=8;
+
+m <- c(m1,m2,m3,m4,m5,m6)
+
+
+# (c)
+
+#Gibbs Sampling
+
+## functions to sample each parameter from its full conditionals
+
+### update theta_i
+fn_update_theta <- function(y, m, mu, sig2, tau2)
+{
+  theta<-NULL
+  for(j in 1:length(m))
+  {
+    theta[j] <- rnorm(1, (sum(y$measurements[y$machine==j])/sig2[j] +
+    mu/tau2)/((m[j]/sig2[j])+(1/tau2)), sqrt(1/((m[j]/sig2[j])+(1/tau2))))
+  }
+  return(theta)
+}
+
+## update sig2
+fn_update_sig2 <- function(m, v0, s0, y_theta_sq_s)
+{
+  sigma<-NULL
+  for(j in 1:length(m))
+  {
+    sigma[j] <- 1.0/rgamma(1, (m[j]/2)+(v0/2), (y_theta_sq_s[j])/2 + (s0^2/2)) 
+  }
+  return(sigma)
+  
+}
+
+## update s02
+fn_update_s02 <- function(n, as, sig_sum, bs)
+{
+  s02 <- 1.0/rgamma(1, as, (1/(sig_sum*2)) + bs)
+  return(s02)
+  
+}
+
+## udpate mu
+fn_update_mu <- function(theta_s, tau2, mu0, omega2, n)
+{
+  va <- 1/(n/tau2 + 1/omega2)
+  mme <- va*((theta_s/tau2) + (mu0/omega2))
+  
+  mu <- rnorm(1, mme, sqrt(va))
+  return(mu)
+  
+}
+
+## update tau2
+fn_update_tau2 <- function(n, at, y_theta_mu_sq, bt)
+{
+  tau2 <- 1.0/rgamma(1, (n/2)+at, y_theta_mu_sq/2 + bt)
+  return(tau2)
+  
+}
+
+# hyperparamenters generating higher variance on the distribution of the priors,
+# being so a vague prior
+
+## hyperparameter
+hyper <- NULL
+hyper$v0 <- 6
+hyper$s0 <- 3
+
+hyper$mu0 <- 90
+hyper$omega2 <- 100
+
+hyper$at <- 3
+hyper$bt <- 3
+
+hyper$as <- 3
+hyper$bs <- 3
+
+## initial values
+par_sam <- NULL
+par_sam$theta <- rep(mean(y$measurements), n)
+par_sam$sig2 <- rep(var(y$measurements), n)
+par_sam$s02 <- 10^3
+par_sam$mu <- 90
+par_sam$tau <- 10^3
+
+## variables for the MCMC
+ns <- 40000
+
+## save simulated para
+MCMC_sam_M2 <- NULL
+MCMC_sam_M2$theta <- array(NA, dim=c(n, ns))
+MCMC_sam_M2$sig2 <- array(NA, dim=c(n, ns))
+MCMC_sam_M2$s02 <- rep(NA, ns)
+MCMC_sam_M2$mu <- rep(NA, ns)
+MCMC_sam_M2$tau <- rep(NA, ns)
+
+## MCMC modeling
+
+for(i_iter in 1:ns)
+{
+  if((i_iter%%1000)==0)
+  {
+    print(paste("i.iter=", i_iter))
+    print(date())
+  }
+  
+  ## udpate theta
+  par_sam$theta <- fn_update_theta(y, m, par_sam$mu, par_sam$sig2, par_sam$tau)
+  
+  ## creating a vector of theta to evaluate sigma^2
+  for(ii in 1:length(m)){
+    if(ii==1){
+      par_sam$theta_list<-rep(par_sam$theta[ii],m[ii])
+    } else{
+      p_the <- rep(par_sam$theta[ii],m[ii])
+      par_sam$theta_list<-c(par_sam$theta_list,p_the)}
+  }
+  
+  y$theta_list <- par_sam$theta_list
+  y_theta_dif<-NULL
+  for(jj in 1:length(m)){
+    y_theta_dif[jj] <- sum((y$measurements[y$machine==jj] - 
+    y$theta_list[y$machine==jj])^2)
+  }
+  
+  par_sam$sig2 <- fn_update_sig2(m, hyper$v0, hyper$s0, y_theta_dif)
+  
+  par_sam$s02 <- fn_update_s02(n, hyper$as, sum(par_sam$sig2), hyper$bs)
+  
+  ## udpate mu
+  par_sam$mu <- fn_update_mu(sum(par_sam$theta), par_sam$tau, hyper$mu0, hyper$omega2, 
+  n)
+  
+  ## update tau2
+  par_sam$tau <- fn_update_tau2(n, hyper$at, sum((par_sam$theta - par_sam$mu)^2), 
+  hyper$bt)
+  
+  ## save cur_sam
+  MCMC_sam_M2$theta[,i_iter] <- par_sam$theta
+  MCMC_sam_M2$sig2[,i_iter] <- par_sam$sig2
+  MCMC_sam_M2$mu[i_iter] <- par_sam$mu
+  MCMC_sam_M2$tau[i_iter] <- par_sam$tau
+  MCMC_sam_M2$s02[i_iter] <- par_sam$s02
+  
+}
+
+n_bur <- 1000
+thin <- 3
+
+#posterior mean for the parameters
+apply(MCMC_sam_M2$sig2[,seq(n_bur+1, ns,by=thin)],1,mean)
+apply(MCMC_sam_M2$theta[,seq(n_bur+1, ns,by=thin)],1,mean)
+
+mean(MCMC_sam_M2$mu[seq(n_bur+1, ns,by=thin)])
+mean(MCMC_sam_M2$tau[seq(n_bur+1, ns,by=thin)])
+mean(MCMC_sam_M2$s02[seq(n_bur+1, ns,by=thin)])
+
+# credibility intervals for the parameters
+apply(MCMC_sam_M2$theta[,seq(n_bur+1, ns,by=thin)], 1, quantile,  probs=c(0.025, 0.975))
+apply(MCMC_sam_M2$sig2[,seq(n_bur+1, ns,by=thin)], 1, quantile,  probs=c(0.025, 0.975))
+
+quantile(MCMC_sam_M2$mu[seq(n_bur+1, ns,by=thin)], probs=c(0.025, 0.975))
+quantile(MCMC_sam_M2$tau[seq(n_bur+1, ns,by=thin)], probs=c(0.025, 0.975))
+quantile(MCMC_sam_M2$s02[seq(n_bur+1, ns,by=thin)], probs=c(0.025, 0.975))
+
+# Question 4
+
+# Computing deviance information criteria
+ndic = length(MCMC_sam_M2$mu[seq(n_bur+1, ns,by=thin)])
+l <- vector("list", 6)
+for(i in 1:6){
+  theta_m1 = matrix(rep(MCMC_sam_M1$theta[i,seq(n_bur+1, ns,by=thin)],m[i]), 
+  nrow = ndic, ncol = m[i])
+  l[[i]] = theta_m1 
+}
+theta_m1 = do.call("cbind", l)
+sigma_m1 = (MCMC_sam_M1$sig2[seq(n_bur+1, ns,by=thin)])
+
+dev.m1 = matrix(0, ndic, nrow(y))
+for (i in 1:nrow(y)){
+  dev.m1[,i] = dnorm(y$measurements[i], theta_m1[,i], sqrt(sigma_m1), log = TRUE)
+}
+
+l <- vector("list", 6)
+for(i in 1:6){
+  theta_m2 = matrix(rep(MCMC_sam_M2$theta[i,seq(n_bur+1, ns,by=thin)],m[i]), 
+  nrow = ndic, ncol = m[i])
+  l[[i]] = theta_m2
+}
+theta_m2 = do.call("cbind", l)
+
+l <- vector("list", 6)
+for(i in 1:6){
+  sigma_m2 = matrix(rep(MCMC_sam_M2$sig2[i,seq(n_bur+1, ns,by=thin)],m[i]), 
+  nrow = ndic, ncol = m[i])
+  l[[i]] = sigma_m2 
+}
+sigma_m2 = do.call("cbind", l)
+
+dev.m2 = matrix(0, ndic, nrow(y))
+for (i in 1:nrow(y)){
+  dev.m2[,i] = dnorm(y$measurements[i], theta_m2[,i], sqrt(sigma_m2[,i]), log = TRUE)
+}
+
+dev.m1 = -2*apply(dev.m1, 1, sum)
+m1_DIC = mean(dev.m1) + var(dev.m1)/2
+
+dev.m2 = -2*apply(dev.m2, 1, sum)
+m2_DIC = mean(dev.m2) + var(dev.m2)/2
+
+Gfs = c(mean(dev.m1),mean(dev.m2))
+Gfs
+pDs = c(var(dev.m1)/2, var(dev.m2)/2)
+pDs
+
+DICs = c(m1_DIC,m2_DIC)
+DICs
+
+
+# Question 5
+
+par(mfrow=c(1,2))
+### posterior distribution of the mean of sixth machine
+hist(MCMC_sam_M1$theta[6,seq(n_bur+1, ns,by=thin)], freq=FALSE, main="Model 1",
+xlab=expression(paste(theta[6])))
+abline(v=mean(MCMC_sam_M1$theta[6,seq(n_bur+1, ns,by=thin)]), col=2, lty=1)
+abline(v=quantile(MCMC_sam_M1$theta[6,seq(n_bur+1, ns,by=thin)], 
+probs=c(0.025, 0.975)), col=2, lty=2)
+
+hist(MCMC_sam_M2$theta[6,seq(n_bur+1, ns,by=thin)], freq=FALSE, main="Model 2",
+xlab=expression(paste(theta[6])))
+abline(v=mean(MCMC_sam_M2$theta[6,seq(n_bur+1, ns,by=thin)]), col=2, lty=1)
+abline(v=quantile(MCMC_sam_M2$theta[6,seq(n_bur+1, ns,by=thin)], 
+probs=c(0.025, 0.975)), col=2, lty=2)
+
+### posterior predictive distribution for another quality of the sixth machine
+par(mfrow=c(1,2))
+y_pred_1 <- (rnorm(5000, MCMC_sam_M1$theta[6,seq(n_bur+1, ns,by=thin)],
+sqrt(MCMC_sam_M1$sig2[seq(n_bur+1, ns,by=thin)])))
+hist(y_pred_1, main="Model 1", freq=FALSE, xlab=expression(paste(y[6][j])))
+abline(v=mean(y_pred_1), col=2, lty=1)
+abline(v=quantile(y_pred_1, probs=c(0.025, 0.975)), col=2, lty=2)
+
+y_pred_2 <- (rnorm(5000, MCMC_sam_M2$theta[6,seq(n_bur+1, ns,by=thin)], 
+sqrt(MCMC_sam_M2$sig2[6,seq(n_bur+1, ns,by=thin)])))
+hist(y_pred_2, main="Model 2", freq=FALSE, xlab=expression(paste(y[6][j])))
+abline(v=mean(y_pred_2), col=2, lty=1)
+abline(v=quantile(y_pred_2, probs=c(0.025, 0.975)), col=2, lty=2)
+
+par(mfrow=c(1,2))
+### posterior predictive distribution for a seventh machine
+theta_pred_7th_1 <- (rnorm(5000, MCMC_sam_M1$mu[seq(n_bur+1, ns,by=thin)],
+sqrt(MCMC_sam_M1$tau[seq(n_bur+1, ns,by=thin)])))
+hist(theta_pred_7th_1, main="Model 1", freq=FALSE, xlab=expression(paste(theta[7])))
+abline(v=mean(theta_pred_7th_1), col=2, lty=1)
+abline(v=quantile(theta_pred_7th_1, probs=c(0.025, 0.975)), col=2, lty=2)
+
+theta_pred_7th_2 <- (rnorm(5000, MCMC_sam_M2$mu[seq(n_bur+1, ns,by=thin)],
+sqrt(MCMC_sam_M2$tau[seq(n_bur+1, ns,by=thin)])))
+hist(theta_pred_7th_2, main="Model 2", freq=FALSE, xlab=expression(paste(theta[7])))
+abline(v=mean(theta_pred_7th_2), col=2, lty=1)
+abline(v=quantile(theta_pred_7th_2, probs=c(0.025, 0.975)), col=2, lty=2)
+
+# prediction for a new quality of the sixth machine
+theta_6th_M1 = MCMC_sam_M1$theta[6,seq(n_bur+1, ns,by=thin)]
+sigma_6th_M1 = MCMC_sam_M1$sig2[seq(n_bur+1, ns,by=thin)]
+
+theta_6th_M2 = MCMC_sam_M2$theta[6,seq(n_bur+1, ns,by=thin)]
+sigma_6th_M2= MCMC_sam_M2$sig2[6,seq(n_bur+1, ns,by=thin)]
+
+nsp = length(theta_6th_M1)
+y_pred_1 = matrix(0,nsp,m6)
+y_pred_2 = matrix(0,nsp,m6)
+
+for (i in 1:nsp){
+  y_pred_1[i,] = (rnorm(rep(1,m6), theta_6th_M1[i], sqrt(sigma_6th_M1[i])))
+  y_pred_2[i,] = (rnorm(rep(1,m6), theta_6th_M2[i], sqrt(sigma_6th_M2[i])))
+}
+
+y_6th_M1 = (apply(y_pred_1,2,mean))
+y_6th_M2 = (apply(y_pred_2,2,mean))
+
+# prediction for a  seventh machine
+theta_pred_7th_1 = (rnorm(2750, MCMC_sam_M1$mu[seq(n_bur+1, ns,by=thin)],
+sqrt(MCMC_sam_M1$tau[seq(n_bur+1, ns,by=thin)])))
+theta_pred_7th_2 = (rnorm(2750, MCMC_sam_M2$mu[seq(n_bur+1, ns,by=thin)],
+sqrt(MCMC_sam_M2$tau[seq(n_bur+1, ns,by=thin)])))
+
+sigma_7th_M1= MCMC_sam_M1$sig2[seq(n_bur+1, ns,by=thin)]
+
+s02_7th_M2 = MCMC_sam_M2$s02[seq(n_bur+1, ns,by=thin)]
+sigma_7th_M2 = 1/rgamma(length(s02_7th_M2),1/2,s02_7th/2)
+
+nsp = length(theta_pred_7th_1)
+y_pred_7th_1 = matrix(0,nsp,m6)
+y_pred_7th_2 = matrix(0,nsp,m6)
+
+for (i in 1:nsp){
+  y_pred_7th_1[i,] = (rnorm(rep(1,m6), theta_pred_7th_1[i], sqrt(sigma_7th_M1[i])))
+  y_pred_7th_2[i,] = (rnorm(rep(1,m6), theta_pred_7th_2[i], sqrt(sigma_7th_M2[i])))
+}
+
+y_7th_M1 = (apply(y_pred_7th_1,2,mean))
+y_7th_M2 = (apply(y_pred_7th_2,2,mean))
+
+plot(y_7th_M1, pch=16,ylim=c(min(y_7th_M2),max(y_7th_M2)), ylab="", 
+main="Prediciton for a seventh machine")
+points(y_7th_M2,pch=16, col=2)
+legend(1,max(y_7th_M2),pch=16,col=c(1,2),legend=c("M1","M2"))
+
+
+\end{verbatim}
+
+\end{document}
