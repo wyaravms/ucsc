@@ -1,0 +1,385 @@
+\documentclass{asaproc}
+
+
+\usepackage[margin=1in]{geometry} 
+\usepackage{amsmath,amsthm,amssymb}
+\usepackage{listings}
+\usepackage{graphicx}
+\usepackage[]{bigints}
+\usepackage{indentfirst}
+\renewcommand{\baselinestretch}{1}
+\usepackage{subcaption}
+\usepackage{float}
+\usepackage{dsfont}
+\graphicspath{ {images/} }
+\usepackage{comment} % enables the use of multi-line comments (\ifx \fi) 
+\usepackage{fullpage} % changes th
+%\usepackage{times}
+%If you have times installed on your system, please
+%uncomment the line above
+
+%For figures and tables to stretch across two columns
+%use \begin{figure*} \end{figure*} and
+%\begin{table*}\end{table*}
+% please place figures & tables as close as possible
+% to text references
+\newcommand{\overbar}[1]{\mkern 1.5mu\overline{\mkern-1.5mu#1\mkern-1.5mu}\mkern 1.5mu}
+
+\newcommand{\be}{\begin{equation}}
+\newcommand{\ee}{\end{equation}}
+
+ \title{Hierarchical Model for Sea Surface Temperature}
+
+%input all authors' names
+
+\author{Wyara Vanesa Moura e Silva\\
+AMS 207 Quiz 2\\}
+
+%input affiliations
+
+%{USDA Forest Service Forest Products Laboratory}
+
+\begin{document}
+
+\maketitle
+
+
+\begin{abstract}
+
+Sea Surface Temperature (SST) is the water temperature close to the surface of the ocean, the area analyzed here corresponds to the Mediterranean Sea. In this paper, we present a hierarchical Bayesian model, with the purpose of making inferences and predictions of temperatures in the analyzed oceanic region. The model obtained a reasonable good fit to the data and the predictions were slightly consistent with observed temperature data.
+
+\begin{keywords}
+temperature, device, model, covariates, predictive. 
+\end{keywords}
+\end{abstract}
+
+\section{Introduction}
+In this work, we will apply a hierarchical model to analyze the surface temperatures of the sea (SST) in a Mediterranean area. The SST measure varies according to the measurement method used, but it is usually between 1 millimeter (0.04 in) and 20 meters (70 ft) below the sea surface. The area analyzed corresponds to the Mediterranean Sea, which is a sea connected to the Atlantic Ocean, being enclosed by land: on the north by Southern Europe, on the south by North Africa. 
+
+The data analyzed contains observations from 86 different devices on the SST in a number of locations in the Mediterranean, corresponding to December 2003. The dataset contains the following variables:
+\begin{itemize}
+\item device number (86 devices)
+\item latitude 
+\item longitude
+\item temperature in degrees Centigrades
+\item number of replicates observations recorded by the device
+\item type of the device (bucket, d.buoy, eri and f.buoy)
+\end{itemize}
+
+The number of replicates are denoted by $n_i$ in which, when $n_i > 1$, the reported temperature corresponds to the $n_i$ records. The objective is to use a hierarchical model to estimate the SST measured by each device as well as the variability associated with the measurement.
+
+Figure \ref{Fig1} display the histogram for the SST data, and we can notice that the distribution seems to be distributed normal, but with a bit of skew on the right.
+
+Some descriptive statistics about the SST original data would be that, $n=86$, for the mean $\overbar{y}_i = 19.55$, the standard deviation sd$(y_i) = 1.40$, $y_{max} = 22$, and $y_{min} = 15$.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width = 0.5\textwidth, height =0.3\textheight]{hist-data.pdf}
+\caption{Histogram of the sea surface temperature in the Mediterranean. Red line correspond to the density.}
+\label{Fig1}
+\end{figure}
+
+Figure \ref{pairs} we can not observe any strong linear relationship between the variables, except between latitude and longitude that has a slight negative slope. Among other covariates inclinations are less perceptible.
+
+In addition, we calculated Spearman correlations (using \texttt{cor} function in \texttt{R}), in which results were obtained for longitude, latitude and temperature with the type of device, correlations of 0.2441, 0.1560 and -0.1030, respectively. And latitude and longitude with temperature, correlation of -0.0781 and 0.1688, respectively. Correlations considerably low. The variable type of device was considered as number to perform the correlation calculations.
+\begin{figure}[H]
+\centering
+\includegraphics[width = 0.5\textwidth, height =0.3\textheight]{pairs.pdf}
+\caption{Pairs plots for the correlation between the latitude, longitude, temperature and device type.}
+\label{pairs}
+\end{figure}
+
+
+\section{Methods} \label{method}
+
+\subsection{Hierarchical Model} 
+
+Denote $y_{i}$ the $i$-th device, in which $i = 1, ..., n$, $n=86$. Setting the model as: 
+\begin{eqnarray*}
+\begin{array}{rcl }
+y_i & = & \mu_i + \epsilon_i, \hspace{0.5cm} \epsilon_i \sim \mathcal{N}(0,\sigma_i^2/n_i)  \hspace{0.5cm} i = 1,...,n\\
+\end{array}
+\end{eqnarray*}
+
+In which, the model has the following likelihood for the $y_{i}$, 
+\begin{eqnarray*}
+\begin{array}{lcl ll }
+p(y_{i}|\mu_i, \sigma^2_i) & \sim & \mathcal{N} (\mu_i, \sigma_i^2/n_i) 
+\end{array}
+\end{eqnarray*}
+
+Now, considering the following priors for the parameters.
+\begin{eqnarray*}
+\begin{array}{rcl}
+\mu_i & \sim & \mathcal{N}(\textbf{x}^T_i\boldsymbol{\beta},\tau^2)  \hspace{0.5cm} i = 1,...,n
+\end{array}
+\end{eqnarray*}
+\noindent
+where $\textbf{x}_i$ = (1, lat, lon, device type)$_i$ 
+\begin{eqnarray*}
+\begin{array}{rcl}
+\pi(\boldsymbol{\beta}, \tau) & \propto & 1\\\\
+
+\pi(\sigma^2_i|\sigma^2) & \sim & \mathcal{IG}(\sigma^2_i|\alpha +1,\alpha\sigma^2) \hspace{0.5cm} i = 1,...,n \\\\
+
+\pi(\sigma^2) & \sim & \mathcal{G}(\sigma^2|a,b)
+\end{array}
+\end{eqnarray*}
+
+Then, we can find the full conditionals distributions for the parameters $\boldsymbol{\theta} = (\mu_i, \sigma^2_i, \sigma^2, \boldsymbol{\beta}, \tau^2)$, for Model 1, which are given by:
+\begin{eqnarray*}
+\begin{array}{rcl}
+\pi(\mu_i|\cdot) & \sim & \mathcal{N}\left( \dfrac{\tau^2 y_i n_i + \textbf{x}^T_i\boldsymbol{\beta}\sigma^2_i}{\tau^2 n_i +\sigma_i^2}, \dfrac{\tau^2\sigma_i^2}{\tau^2 n_i + \sigma_i^2} \right) \\ \\
+
+\pi(\sigma^2_i|\cdot) & \sim & \mathcal{IG}\left( \dfrac{1}{2} + (\alpha + 1), \alpha \sigma^2 + \dfrac{n_i ( y_i - \mu_i)^2}{2} \right) \\ \\
+
+\pi(\sigma^2|\cdot) & \sim & \mathcal{G}\left( n*(\alpha + 1)+a, b + \alpha\sum_{i=1}^{n}\frac{1}{\sigma_i^2}\right) \\ \\
+
+%\pi(\tau^2|\cdot) & \sim & \mathcal{IG}\left( \dfrac{n}{2}+c,  \dfrac{\sum_{i=1}^{n} (\mu_i - \mu)^2}{2} + d \right) \\\\
+
+\pi(\boldsymbol{\beta}|\cdot) & \sim & \mathcal{MVN}\left( \hat{\boldsymbol{\beta}}, \tau^2 (\textbf{x}^T_i\textbf{x}_i)^{-1} \right) \\ \\
+
+\pi(\tau^2|\cdot) & \sim & \mathcal{IG}\left(  \dfrac{n}{2} - 1, \dfrac{\sum_{i=1}^{n} (\mu_i - \textbf{x}^T_i\boldsymbol{\beta})^2}{2} \right) 
+\end{array}
+\end{eqnarray*}
+\noindent
+in which the $(\cdot)$ represents the data and all the other variables, $\mathcal{N}$ the normal density, $\mathcal{G}$ the gamma density and $\mathcal{IG}$ the inverse gamma density. The $\hat{\boldsymbol{\beta}}$ corresponds to the least squared estimates of the $\boldsymbol{\beta}$ obtained in each iteration conditioned on the $\mu_i$ sampled.
+
+Now we can derive a Gibbs sampling to explore the posterior distribution for all the parameters. The idea is to generate posterior samples by sweeping through each variable to sample from its conditional distribution with the remaining variables fixed to their current values (Gelman et al., 2014). Inside the Gibbs sampling, we updated the parameters in the following order: $\boldsymbol{\beta}$, $\tau^2$, $\mu_i$, $\tau^2$, $\sigma_i^2$ and $\sigma^2$.
+
+\subsection{Model Checking and Model Comparison}
+
+\subsubsection{Model Checking}
+In order to perform the model checking we are going to use first the basic technique which consist of draw simulated values from the joint posterior predictive distribution of replicated data and compare these samples to the observed data. Then, we are going to choose some test quantity $T(y)$ to compare the observed data to the posterior predictive distribution. And then we calculate The Bayesian p-value which is defined by:
+\begin{equation*}
+\begin{array}{lclll}
+p_B & = & \mbox{Pr}(T(y^{rep})>T(y))
+\end{array}
+\end{equation*}
+\noindent
+in which the p-value correspond to the proportion of the sampled replicate statistics above the observed value from the data. And then we did some different plots that will be explained in the section corresponding to the results.
+
+\subsubsection{Model Comparison}
+For the model comparison it was used two different criterion. First it was perform the deviance information criterion (DIC) which is a criterion that use the information from the posterior distribution of the parameters. This criterion used in the analysis was setting by:
+\begin{equation*}
+\begin{array}{lclll}
+DIC & = & \overbar{D}(\theta) + 2p_{D}\\
+\end{array}
+\end{equation*}
+\noindent
+in which $D(\theta) =  -2\log(f(\textbf{y}|\theta))$ is the deviance and the $\overbar{D}$ is the mean of the posterior over all the $\theta$ sampled. And the $p_{D} =$ $\mathds{V}$ar $(D(\theta))/2$ which is the sample variance of the $D(\theta)$ divided by 2 (Gelman et al., 2014).
+
+The second will be the Gelfand and Gosh criterion, which is known as posterior predictive loss approach, This method provides an index of the predictive capacity of a model comparing observed data with replicated data. This criterion is defined by:
+\begin{equation*}
+\begin{array}{lclllll}
+D & = & G + P = & \displaystyle\sum_{l=1}^{n}(y_l - \mu_l)^2 + \displaystyle\sum_{l=1}^{n} \sigma^2_l\\
+\end{array}
+\end{equation*} 
+\noindent
+which $\mu_l = \mathds{E}(y_l^{rep}|\textbf{y})$ and $\sigma_l^2 =  \mathds{V}ar(y_l^{rep}|\textbf{y})$, in which $y_l^{rep}$ are the replicas of the posterior values for each data point (Gelfand et al. 1998).
+
+\section{Results}
+
+In the following results, it was obtained $M = 10000$ posterior samples after the burn-in period. Some information about the convergence will be given in Subsection \ref{convergence}. Figures \ref{FigDM1} and \ref{FigDM2} display the posterior densities of the parameters of interesting, in those densities it was draw in red line the credibility intervals and the posterior mean.
+
+It was assumed independence between the priors distribution for the parameters assigned. And the choices for the hyperparameters, $\alpha$, $a$ and $b$ were assigned in order to be as non-informative as possible. For the $\alpha = 3$ to make the distribution for the $\sigma^2_i$ to have mean defined. And the $a=b=3$, which result in a mean and variance for the prior distribution of $\sigma^2$ around 1.5 and 2.25. The initial values for $\mu_i$ was the observed temperature, and for the $\tau^2 = 1.5$, which is close to the value of the sample variance. The design matrix \textbf{x}$_i$ was assign to have one column for the intercept, two column for the covariates, latitude and longitude, and the last three columns the columns of the combinations of 0's and 1's for the three type devices, putting the column for the first type of device as 0. This design matrix was getting from the \texttt{lm} function in \texttt{R}.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width = 0.5\textwidth, height =0.3\textheight]{dens-beta.pdf}
+\caption{Posterior densities for the $\beta_i$, $i=\{1, .., 6 \}$. Red dashed line correspond to the credibility interval (2.5\%;97.5\%) and red solid line the mean.}
+\label{FigDM1}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width = 0.5\textwidth, height =0.3\textheight]{dens-var.pdf}
+\caption{Posterior densities for the $\sigma^2$ and $\tau^2$. Red dashed line correspond to the credibility interval (2.5\%;97.5\%) and red solid line the mean.}
+\label{FigDM2}
+\end{figure}
+
+The results for the a posteriori means were almost equal to the values found using \texttt{lm} function in \texttt{R}, for the $\boldsymbol{\beta}$ and the $\tau^2$, which are the least squared estimates. One of the reasons why this behavior occurs is because we use a non informative uniform prior for $\boldsymbol{\beta}$ and the $\tau^2$. The densities for the $\mu_i$ and $\sigma^2_i$ were not shown here because there was not any issue. And also, because the graph would be very full of density curves since we would have a marginal density for each $_i$th. However, you can see in Figure \ref{mu} and \ref{sigma} a simple graph with the intervals of credibility (5\%;95\%) for each marginal distribution of each $\mu_i$ and $\sigma_i$ respectively, from their posterior distributions. We can note in Figure \ref{sigma} that the standard deviations do not have much variability as to the value of the posterior mean over each i-th value.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width = 0.46\textwidth, height =0.24\textheight]{mu.pdf}
+\caption{Credibility interval (5\%;95\%) and the posterior mean indicated by the solid points for each marginal $\mu_i$ from their posterior distribution.}
+\label{mu}
+\end{figure}
+
+
+\begin{figure}[H]
+\centering
+\includegraphics[width = 0.46\textwidth, height =0.24\textheight]{sigma.pdf}
+\caption{Credibility interval (5\%;95\%) and the posterior mean indicated by the solid points for each marginal $\sigma_i$ from their posterior distribution.}
+\label{sigma}
+\end{figure}
+
+\subsection{Convergence Checking}\label{convergence}
+
+Figure \ref{FigMCACF1} to \ref{FigMCACF2} show the plots for the Markov chain for the eight parameters of interesting, which are, $\beta_i$, $i=\{1, .., 6 \}$, $\sigma^2$ and $\tau^2$ and plots of the autocorrelation function. It was sample a $M = 41000$ and the burn-in chose was $B = 1000$ and it was thinning by 4. We can notice that for each model the chain converge and the autocorrelation is not too high for the  $\beta_i$, $i=\{1, .., 6 \}$. 
+
+\begin{figure}[H]
+\centering
+\includegraphics[width = 0.5\textwidth, height =0.3\textheight]{chain-acf-beta.pdf}
+\caption{Markov Chain and Autocorrelation plots for $\beta_1$, $\beta_2$ and $\beta_3$.}
+\label{FigMCACF1}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width = 0.5\textwidth, height =0.3\textheight]{chain-acf-beta-2.pdf}
+\caption{Markov Chain and Autocorrelation plots for $\beta_4$, $\beta_5$ and $\beta_6$.}
+\label{FigMCACF12}
+\end{figure}
+
+However, for $\sigma^2$ and $\tau^2$, the chains do not converge so well, and the reason is because the chains have high correlation even after thinning the chains by 4 (as can be seen in the plots).
+
+For the others parameters corresponding to $\mu_i$ and $\sigma^2_i$ were not observed any issue with concerning to the convergence. Some of them had a slightly high correlation, but none of them high as those in Figure \ref{FigMCACF2}. Then, it was chosen not to show the chains plots for those parameters.
+
+
+\begin{figure}[H]
+\centering
+\includegraphics[width = 0.5\textwidth, height =0.3\textheight]{chain-acf-var.pdf}
+\caption{Markov Chain and Autocorrelation plots for $\sigma^2$ and $\tau^2$.}
+\label{FigMCACF2}
+\end{figure}
+
+
+\subsection{Model Checking}
+
+We simulate 10.000 samples from the posterior predictive distribution, which in this case we can do the prediction for the $y_i$ observed using the posterior distribution of the parameters. The posterior distribution of $\mu_i$, $\sigma^2_i$ and $N$ (the number of replicated observations recorded by the device, from the observed data). We then calculated, statistics from predictions samples and statistics from the observed data, which were: the maximum, the minimum, the mean and the standard deviation.
+
+Figures \ref{FigMC1} shows the comparisons between the histograms of the statistics from predictive posterior distributions and the corresponding observed values from data. We can see the plots and the p-value that the predictions are in good agreement with observed values for all four statistics.
+
+Figure \ref{Pred} shows on the bottom the summary for each posterior predictive distribution sampled by the $5$th and $95$th quantiles. We can see how the observed data are consistent with corresponding predictive posterior distributions. On the top of Figure \ref{Pred} we have a plot of the observed values versus predicted values, we can observe how the predictions agree slightly with the observed values
+
+Therefore, with this outcomes we can conclude by this approach that the models fits well the data. In order to evaluate the goodness of the fit for the $\boldsymbol{\beta}$ coefficients, we generate a new model without the covariates, a model with only the intercept, in which we will call the null model. 
+
+\begin{figure}[H]
+\centering
+\includegraphics[width = 0.5\textwidth, height =0.3\textheight]{hist-pred.pdf}
+\caption{Histogram of samples from the posterior predictive distributions of some summaries of the temperature. Red dashed lines corresponds to the observed values. Also the p-values from the comparison.}
+\label{FigMC1}
+\end{figure}
+
+The estimates for the parameters of the null model were very close to the least squared estimated from the \texttt{lm} function in \texttt{R}. We chose not to show the inferences results for the null model. But we can point out that the markov chains obtained the same behavior to the observed in the main model, for the intercept, $\mu_i$ and $\sigma^2_i$ the convergence is clearly reached, however for the variances the chains have correlation, which takes the chains to have a strange behavior. 
+
+Thus, after adjustment we used two criteria for comparison, Gelfand and Gosh and DIC. Table \ref{criter} shows the values for the criteria results. In summary, looking at the results from the DIC method, we can notice that this criteria favor the null Model and if we evaluate the goodness of fit and the Effective size (penalty), it can be seen that both favor the null Model. As well as the same behavior of the Gelfand and Gosh criteria, the null model is favored. 
+
+Therefore, we can conclude that the variables do not explain significantly the variation of the observations, agreeing with the results obtained using least squares, which shows that the covariates are not significant except the intercept. To be more specific, the results obtained using \texttt{lm} function in \texttt{R}, are that the p-values for each covariate are greater than 0.1, and the intercept has p-value less than 0.05.
+\begin{table}[H]
+\caption{Criterion values for the model comparison.}\label{criter}
+\centering
+\begin{tabular}{llllllcc}
+\hline
+Criterion & & Main Model & Null Model \\
+\hline
+
+DIC & & 223.2904 & 208.7544  \\
+& GF & 155.5707 & 141.5973 \\
+& ES  & 67.7197 & 67.1571 \\
+
+GG & & 147.6857 & 129.1002 \\
+& GF & 31.2628 & 24.7946  \\
+& P  & 116.4229 & 104.3055 \\
+
+\hline
+\end{tabular} \\
+Note: GG: Gelfand and Gosh; GF: Goodness of Fit; ES: Effective Size; P: Penalty
+\end{table}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width = 0.48\textwidth, height =0.26\textheight]{pred-obs.pdf}  
+\includegraphics[width = 0.48\textwidth, height =0.26\textheight]{pred.pdf}  
+\caption{Observed values versus predicted values, with the $95$th predictive percentile interval, and the predictive posterior mean indicated by the solid points (top). Posterior predictive distributions of $y_i^{rep}$ with the actual SST $y_i$ indicated by the solid points (bottom).}
+\label{Pred}
+\end{figure}
+
+
+Another point that we can observe is that the value 0 is within the credibility intervals for the $\boldsymbol{\beta}$ (see Figure \ref{FigDM1}), which indicates that beta can turn out to be zero, which comes from the fact that the estimates for the betas have very low values expect for the intercept.
+
+\subsubsection{Exploratory analysis of the posterior predictive distribution}
+
+Now, we are going to evaluating the posterior predictive of the SST in a rectangular area that contains all the observational site. It was set a area between the minimum and maximum of the latitude and longitude of the observed data, setting the grid by each 0.1, then it was calculated the temperature to each combination of the latitude and longitude in the grid area, corresponding to each different type of device. 
+
+Therefore, for each pair of combination of (lat$_i$, lon$_j$), which we end up with a matrix of $2464$ rows and two columns. Then, we need to evaluate each pair of coordinates for each device, setting a identity matrix $\mathds{I}_4$ without the first line for each combination. Then, now my new design matrix is going to have $\textbf{X}(r = 9856, c = 6)$. We are using only $5000$ sample from the posterior distribution of the parameters, because of some memory issue.  
+
+\begin{figure}[H]
+\centering
+\includegraphics[width = 0.48\textwidth, height =0.26\textheight]{map.pdf}
+\caption{Map of the Mediterranean area with the dots corresponding to the SST for each four devices from the observed data.}
+\label{maps}
+\end{figure}
+
+To be specific the range area of the grid was: $x=(25.1, 33.8)$, $y=(31.8, 34.5)$, $x$ corresponds to longitude and $y$ to latitude. Then, for each (latitude$_i$, longitude$_i$), it was predicted a new temperature corresponding to each four device type (bucket, d.buoy, eri and f.buoy). 
+
+Therefore, in order to predict future observations for the temperature inside the grid, first we must sample $\sigma^2_{ir}$ from the $\mathcal{IG}(\alpha + 1, \alpha \sigma^2)$ using our posterior distribution of the $\sigma^2$, and in this work we sample $\mu_{ir}$ from $\mathcal{N}(\textbf{x}_i^T\boldsymbol{\beta}, \tau^2)$, in this case our $\textbf{x}_i^T$ is from our new design matrix, and $\boldsymbol{\beta}$ is from our posterior distribution. 
+
+\begin{figure}[H]
+\centering
+\includegraphics[width = 0.48\textwidth, height =0.26\textheight]{map-bucket.pdf}  
+\includegraphics[width = 0.48\textwidth, height =0.26\textheight]{map-dbuoy.pdf} 
+\caption{Mean of the replicas of posterior predictions distributions of the temperate with respect to device bucket (top) and d.buoy (bottom).}
+\label{maps-mean-1}
+\end{figure}
+
+Then, it was sampled $y_{ir}$ from the $\mathcal{N}(\mu_{ir}, \sigma_{ir}^2/n_i)$, in which the $n_i$ chose here was setting by 1, being the number of replicated observations, for each new $y_{ir}$ prediction. 
+
+The number of replicated observations recorded by the device for each new prediction was chosen to be 1 because the original data have 70 out of 86 being one, so seems reasonable chose 1 for the predictions. 
+
+Figure \ref{maps} displays the map area of the Mediterranean sea with the correspond observed data, labeled by each device.
+
+First, the SST predictions were generated in the grids without the maps, and only afterward we plotted on the map. Thus, we chose to show only the rectangular areas plotted on the map.
+
+Figures \ref{maps-mean-1} and \ref{maps-mean-2} display the posterior predictive of the mean of the replicas generate for the new observations, for each types of device inside the Mediterranean area. We can verify that they have a similar behavior for the predictions, the range for the four types of devices was around the sample mean of the observed SST. 
+
+\begin{figure}[H]
+\centering
+\includegraphics[width = 0.48\textwidth, height =0.26\textheight]{map-eri.pdf}
+\includegraphics[width = 0.48\textwidth, height =0.26\textheight]{map-fbuoy.pdf} 
+\caption{Mean of the replicas of posterior predictions distributions of the temperate with respect to device eri (top) and f.buoy (bottom).}
+\label{maps-mean-2}
+\end{figure}
+
+In addition, we can note that when closer to the coast near the eastern coast and Island nations, temperatures tend to be warmer than northern most in regions further away from the continental coast. Another point we can point out would be that the bucket device tends to capture lower temperatures, and the f.buoy device tends to capture higher temperatures, although the difference is not so big between the range of the predictions, of the devices.
+
+Now, in Figures \ref{maps-sd-1} and \ref{maps-sd-2} we can check the variability of the predictions, from the standard deviation of the replicas of the posterior predictive distributions. We can observe that in the center of the rectangular area predicted, the variation is smaller than compared the corners of the predicted area. 
+
+In addition, for the devices, bucket, d.buoy and eri the variation was larger near the coast of the island nations, but for the device f.buoy the variability was higher next to southern shore
+
+
+
+\begin{figure}[H]
+\centering
+\includegraphics[width = 0.48\textwidth, height =0.26\textheight]{map-bucket-sd.pdf}  
+\includegraphics[width = 0.48\textwidth, height =0.26\textheight]{map-dbuoy-sd.pdf} 
+\caption{Standard deviation of the replicas of posterior predictions distributions of the temperate with respect to device bucket (top) and d.buoy (bottom).}
+\label{maps-sd-1}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width = 0.48\textwidth, height =0.26\textheight]{map-eri-sd.pdf}
+\includegraphics[width = 0.48\textwidth, height =0.26\textheight]{map-fbuoy-sd.pdf} 
+\caption{Standard deviation of the replicas of posterior predictions distributions of the temperate with respect to device eri (top) and f.buoy (bottom).}
+\label{maps-sd-2}
+\end{figure}
+
+\section{Remarks}
+In this work we performed a hierarchical model in order to evaluate the SST data using covariates of latitude, longitude and type of the device of measure. In this model we estimate the SST measure as well as the variability associated with the measurements. The covariates did not show to be quite significant, but the predictions were well consistent with the observed data.
+
+\begin{references}
+{\footnotesize
+\itemsep=3pt
+\item Gelfand, A. E., \& Ghosh, S. K. (1998). Model choice: a minimum posterior predictive loss approach. Biometrika, 85(1), 1-11.
+\item Gelman, A., Carlin, J. B., Stern, H. S., Dunson, D. B., Vehtari, A., \& Rubin, D. B. (2014). Bayesian data analysis (Vol. 3). Boca Raton, FL: CRC press.
+
+}
+
+\end{references}
+
+
+\end{document}
+
