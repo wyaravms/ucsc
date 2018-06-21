@@ -1,0 +1,181 @@
+---
+title: "Homework 5"
+author: "Mary Silva, Wyara Silva, Peter Trubey"
+date: "November 21, 2017"
+output: pdf_document
+---
+
+```{r setup, include=FALSE, message=FALSE, results='hide'}
+knitr::opts_chunk$set(echo = TRUE)
+
+packages = c('ISwR', 'MASS', 'tidyr', 'ResourceSelection', 'ROCR', 'boot', 'Epi')
+sapply(packages, require, character.only = TRUE)
+```
+
+## Question 1
+```{r q1}
+data("tb.dilute")
+tb.dilute$orddose = tb.dilute$logdose %>%
+  as.character %>%
+  as.numeric %>%
+  factor(levels = c(-0.5, 0, 0.5), labels = c('low','med','high'), ordered = TRUE)
+q1_model = lm(reaction ~ animal + orddose, data = tb.dilute)
+summary(q1_model)
+```
+
+This model performs a two-way ANOVA on the tb.dilute data.  In the model, we look at the effect of the dosage, as well as the individual animal effect on reaction.  Dosage amount has gone through a log-transformation and then been coded as a factor.  The model is defined as:
+\begin{equation*}
+y_{i,j} = \mu + \alpha_i + \beta_j + \varepsilon_{i,j}\hspace{2cm}\varepsilon_{i,j} \sim N(0,\sigma^2)
+\end{equation*}
+In order to make the model-matrix full rank, R has dropped the first columns from each of the factor variables.  Thus, $\mu$ now represents the mean value for animal 1, and log dose $(+)$ 0.5.  
+
+The $R^2$ for this model is given as $0.9266$, which means $92.66\%$ of the variation in the response variable *reaction* is explained by the predictors.
+
+\begin{align*}
+H_0 &: \hspace{1cm}\text{$\alpha_i$, $\beta_j = 0$ $\forall i,j$ - There is no dosage or animal effect.}\\
+H_1 &: \hspace{1cm}\text{At least one of the dosage or animal effects is significant.}
+\end{align*}
+
+The overall F-test for the model, which tests whether any of the individual coefficients are significant, is given as 18.04 with 7 and 10 degrees of freedom.  This corresponds to an extremely low p-value compared to our standard alpha = 0.05 level of significance, causing us to reject the null hypothesis.
+
+We should check the normality of the residuals as well.
+
+```{r q1_a}
+shapiro.test(q1_model$residuals)
+```
+
+The Shapiro-Wilks test for normality of errors fails to reject the null hypothesis, that the errors are normally distributed around 0.  Given this result, we can accept the previous test as valid and sufficient for this analysis.
+
+## Question 2
+```{r q2}
+data("vitcap2")
+vitcap2$group = factor(vitcap2$group)
+
+q2_model = lm(vital.capacity ~ group + age, data = vitcap2)
+
+print(summary(q2_model))
+```
+
+The model performs an analysis of covariance on the vitacap2 data. In this model we analyse the vital capacity, which is a measure of lung volume, with respect to the age of the workers in the cadmium industry, and by the group divided in three categories of being exposed or not.
+
+Here, the intercept represents the mean value for the group 1. 
+
+```{r q2_a}
+anova(q2_model)
+```
+
+However, even the 'anova' function given that the two independent variable are significant, we could see in the output of the R, using the 'summary' function that the variable factor 'group2' and 'group3' are not statistically significant, with p-value greater than 0.05. 
+
+```{r q2_b}
+shapiro.test(q2_model$residuals)
+```
+
+The Shapiro-Wilks test for normality of errors fails to reject the null hypothesis, that the errors are normally distributed around 0, with p-value greater than 0.05. Thus, we can accept the previous test as valid and sufficient for this analysis.
+
+Analyzing another model, we will have: 
+
+```{r q2_c}
+q2_model2 = lm(vital.capacity ~ age, data = vitcap2)
+
+summary(q2_model2)
+```
+
+Now, the model seems to fit better the data. The F-test for the model,  which tests whether any of the individual coefficients are significant, has a p-value less than 0.05, which means that the null hyphotesis will be rejected.  
+
+```{r q2_a2}
+
+shapiro.test(q2_model2$residuals)
+```
+
+The Shapiro-Wilks test for normality of errors fails to reject the null hypothesis, that the errors are normally distributed around 0, with p-value greater than 0.05. 
+
+However, the model with only the variable 'age' seems not be enough useful to interpret and predict the vital capacity for workers in the cadmium industry.
+
+## Question 3
+
+```{r q3}
+data("malaria")
+malaria$subject = factor(malaria$subject)
+
+q3_model = glm(mal ~ age + log(ab), data = malaria, family = binomial(link = 'logit'))
+summary(q3_model)
+```
+
+This model performs a logistic regression on the malaria data. In the model we analyzed the incidence in children aged 3-15 years with or without symptoms of malaria. It was evaluated whether the age and the log-transformed antibody level have effects in the incidence of symptoms of malaria in children. The model initially is defined as:
+
+\begin{equation*}
+log(\frac{p}{1-p}) = \beta_{0} + \beta_{1} \mbox{age} + \beta_{2} \mbox{log(ab)}
+\end{equation*}
+
+However, we could see in the output of the R, that the variable 'age' are not statistically significant, with p-value greater than 0.05. Thus, we may try to use just the log-transformed antibody level to evalute the data. The Residual Deviance has reduced by 18.635 with a loss of two degrees of freedom.
+
+```{r q32}
+q3_model2 = glm(mal ~ log(ab), data = malaria, family = binomial(link = 'logit'))
+summary(q3_model2)
+```
+
+Now the model is defined as:
+
+\begin{equation*}
+log(\frac{p}{1-p}) = \beta_{0} + \beta_{1} \mbox{log(ab)}
+\end{equation*}
+
+With the corresponding values of the parameters: $\beta_0 = 2.1552$ and the $\beta_1 = -0.7122$. The probability of a child having malaria symptoms decreases with the level of antibodides.
+
+The Residual Deviance has reduced by 17.684 with a loss of one degrees of freedom.
+
+## Question 4
+```{r q4}
+data("graft.vs.host")
+graft.vs.host$type = factor(graft.vs.host$type)
+
+model_fitter = function(x){
+  model = glm(x, data = graft.vs.host, family = binomial(link = 'logit'))
+  aic = model$aic
+  # Predicted Values:
+  yhats = predict(model, newdata = graft.vs.host, type = 'response')
+  # Hosmer Lemeshow GoF test:
+  hosm = hoslem.test(graft.vs.host$gvhd, yhats)$p.value
+  # Performance of the Model:
+  pred = prediction(yhats, graft.vs.host$gvhd)
+  perf = performance(pred, 'auc')@y.values[[1]]
+  # CV Error:
+  cverror = cv.glm(graft.vs.host, glmfit = model)$delta[1]
+  return(c(AIC = aic, AUC = perf, GoF = hosm, CVErr = cverror))
+}
+```
+
+the *model\_fitter* function accepts a model formula, computes a model, and computes the model AIC (Akkaike's Information Criterion, a measure based on likelihood of the model, penalized for the number of predictor variables included in the model).
+
+It also runs a Hosmer-Lemeshow Goodness of Fit test on values predicted by the model, indicating whether this model is a poor fit.  The Hosmer Lemeshow Test is interpreted as follows:
+\begin{align*}
+H_0 &:\hspace{1cm}\text{The model is a good fit for the data}\\
+H_1 &:\hspace{1cm}\text{The model is a poor fit for the data}
+\end{align*}
+If the p-value returned by the Hosmer-Lemeshow test is below our alpha value of $0.05$, then we would conclude that the model is a poor fit to the data.
+
+Lastly, it calculates an ROC curve, and computes the area under that curve.  We can use this metric to compare the performance of competing models.
+
+We have a few models we're interested in, with $preg$, $time$, and various transformations of $index$ being used to predict $gvhd$.
+
+```{r}
+models = c(
+  Raw = (gvhd ~ preg + time + index),
+  Log = (gvhd ~ preg + time + log(index)), 
+  Sqrt = (gvhd ~ preg + time + sqrt(index)),
+  OtherLog = (gvhd ~ preg + time + log(index + sqrt(1 + index^2))) 
+)
+
+sapply(models, model_fitter)
+```
+
+
+We're interested in the model with the minimum AIC that meets our Goodness of Fit criterion, and has a high model performance as measured by the area under the ROC curve.  Given these criteria, it seems that model 2, with the strait log transformation of $index$, has the lowest AIC, and AUC and Cross-validated error not vastly different than the competing models.  The goodness of fit test does not find evidence that it is mis-specified either
+
+\clearpage
+The ROC curve for the model with variables 'preg', 'time', and 'log(index)' is displayed below:
+
+```{r, echo=F}
+AUC.1 = ROC(form = gvhd ~ preg + time + log(index), data = graft.vs.host, plot="ROC")
+```
+

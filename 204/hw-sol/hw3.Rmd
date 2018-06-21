@@ -1,0 +1,271 @@
+---
+title: "Homework 3"
+output: pdf_document
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Chapter 6
+### Question 2
+```{r q2, include = FALSE}
+url = 'http://personal.bgsu.edu/~mrizzo/Rx/Rx-data/nyc-marathon.csv'
+marathon = read.csv(url)
+```
+#### A
+```{r c6q2a}
+women.marathon = marathon[marathon$Gender == 'female',]
+```
+
+#### B
+```{r c6q2b}
+t.test(women.marathon$Age, mu = 36.1)
+```
+
+
+
+$$H_0: \mu=36.1$$
+$$H_a: \mu\ne 36.1$$
+
+
+
+From our R output, using the t-test we have a small p-value which is strong evidence to reject the null hypothesis. So the true mean is not equal to 36.1.
+
+#### C
+```{r c6q2c}
+wilcox.test(women.marathon$Age, mu = 36.1)
+```
+
+Also, using the Wilcox test, we see again the p-value is small meaning we have evidence to reject the null hypothesis. The true mean is not equal to 36.1
+
+#### D
+```{r c6q2d}
+confint(lm(women.marathon$Age ~ 1), level = 0.90)
+```
+
+Based on a 90\% confidence interval, the true mean lies between 40.09 and 43.03.
+
+### Question 3
+#### A
+```{r c6q3a}
+men.marathon = marathon[marathon$Gender == 'male',]
+test = t.test(
+  x = men.marathon$Age, 
+  y = women.marathon$Age,
+  alternative = 'greater',
+  conf.level = 0.90
+  )
+print(test)
+```
+
+Ordinarily I prefer the formula method for describing tests, but if using a one-sided alternative, I prefer to have greater control going into the test as to which side is being compared to which.
+
+#### B
+```{r c6q3b}
+test$conf.int
+```
+
+
+
+
+### Question 5
+```{r c6q5}
+url = paste(
+  'http://personal.bgsu.edu/~mrizzo',
+  'Rx/Rx-data/buffalo.cleveland.snowfall.txt',
+  sep = '/'
+  )
+snowdata = read.table(url, header = TRUE)
+```
+
+#### A
+```{r c6q5a}
+snowdata$diff = snowdata$Buffalo - snowdata$Cleveland
+summary(snowdata$diff)
+```
+
+It appears that on average, Buffalo gets more snow than Cleveland.
+
+#### B
+```{r c6q5b}
+snowtest = t.test(snowdata$Buffalo, snowdata$Cleveland, paired = TRUE)
+print(snowtest)
+```
+
+Clearly, Buffalo gets significantly more snow than Cleveland.
+
+#### C
+```{r c6q5c}
+snowtest$conf.int
+```
+
+The 95\% Confidence Interval pegs the average difference between roughly 24.5 and 42.5 inches, in each season.
+
+
+### Question 7
+```{r c6q7, include = FALSE}
+library(htmltab)
+table_url = paste(
+  'http://en.wikipedia.org',
+  'wiki',
+  'Heights_of_presidents_and_presidential_candidates_of_the_United_States',
+  sep = '/'
+  )
+table = htmltab(table_url, which = 4)
+table_names = c(
+  'election', 'winner', 'trash1', 'height_win',
+  'opponent', 'trash2', 'height_lose',
+  'trash3','height_diff'
+)
+names(table) = table_names
+table = table[
+  1:which(table$election == '1948'),
+  -which(names(table) %in% c('trash1','trash2','trash3'))
+  ]
+table$height_win = as.numeric(gsub('[^0-9]','',table$height_win))
+table$height_lose = as.numeric(gsub('[^0-9]','',table$height_lose))
+table$height_diff = as.numeric(gsub('[^0-9]','',table$height_diff))
+pres.data = table[which(as.numeric(table$election) <= 2008),]
+```
+
+```{r c6q7a}
+t.test(
+  x = pres.data$height_win, 
+  y = pres.data$height_lose, 
+  paired = TRUE
+  )
+```
+
+We do not find sufficient evidence to reject the null hypothesis, that the height of the victor and loser are on average equal.
+
+## Chapter 7
+### Question 1
+
+```{r}
+library(MASS)
+data(mammals)
+attach(mammals)
+F1=lm(brain ~ body)
+print(F1)
+
+plot(brain,body)
+abline(lm(brain ~ body))
+
+plot(F1, which=1, add.smooth=FALSE)
+abline(h=0,lty=2)
+```
+
+
+```{r}
+mammals[c(19,32,33), ]
+
+F1$residuals[c(19,32,33)]
+```
+
+The observations 19, 32 and 33 have the largest residuals (in absolute value), which correspond to the mammals: Asian elephant, Human and African elephant. Thus, the observation that has the largest residual (in absolute value) is the 33, corresponding to the African elephant.
+
+### Question 2
+
+``` {r}
+plot(log(brain),log(body),main="Scatterplot of log(brain) vs log(body)")
+
+F2=lm(log(body) ~ log(brain))
+print(F2)
+```
+
+The equation of the fitted model is $\log(brain) = 2.1248 + 0.7517*\log(body)$. Which means that for every one percent increase in $body$, would yield a 0.7517% increase in the average of $brain$. We can noticed that there are not outliers anymore after the transformation. 
+
+```{r}
+plot(log(brain),log(body),main="Scatterplot of log(brain) vs log(body)") 
+abline(lm(log(body) ~ log(brain))) #add fitted line
+```
+
+By evaluating only the fitted line seems to fit the data well since the data is close to the line. This graph was different from the scatterplot of the Exercise 7.1, which concentrated the values around a certain point, and also had three outliers, thus not producing a good fit. 
+
+### Question 3
+
+```{r}
+plot(F2, which=1, add.smooth=FALSE)
+abline(h=0,lty=2)
+
+plot(F2, which=2, add.smooth=FALSE)
+```
+
+We can observe in the residual plot that the residuals are spread around zero, and the variance is a little constant along the $\log(brain)$. In addition, by the normal QQ-plot the residuals are close to the reference line on the plot. Thus the errors may be iid with a Normal($0,\sigma^2$) distribution.
+
+### Question 4
+
+```{r}
+summary(F2)
+
+(summary(F2)$sigma)^2
+
+cor(log(brain), log(body))
+```
+
+The error variance is 0.7855. The coefficient of determination is 0.9195, and the square of the correlation between the response and predictor is 0.9595. The adjust $R^2$ value indicates that more than 91% of the total variaton in brain size is explained by the linear associantion with body size.
+
+### Question 7
+
+```{r}
+attach(cars)
+L1=lm(dist ~ speed)
+summary(L1)
+
+#intercept being 0
+L2 = lm(dist ~ 0 + speed)
+summary(L2)
+
+```
+
+The adjust $R^2$ for the first model is 0.6438, and for the second model is 0.8942. For the first model the $R^2$ indicates that more than 64% of the total variaton in the speed is explained by the linear associantion with stopping distance. And for the second model, the $R^2$ indicates that more than 89% of the total variaton in the speed is explained by the linear associantion with stopping distance, which we can conclude that this model is a better fit for the data.
+
+### Question 8
+
+```{r}
+speed2=speed^2
+L3=lm(dist ~ speed + speed2)
+print(L3)
+
+
+plot(cars, main="Scatter plot of cars data", xlim=c(0, 25))
+curve(2.47014 + 0.91329*x + 0.09996*x^2, add=TRUE)
+
+```
+
+The model adding a quadratic variable seems to fit better the data, given that the data are more spread along the fitted line. 
+
+### Question 9
+
+```{r}
+Trees = trees
+names(Trees)[1] = "Diam"
+attach(Trees)
+
+M1 = lm(Volume ~ Diam + I(Diam^2))
+print(M1)
+
+new = data.frame(Diam=16)
+predict(M1, new)
+
+```
+
+```{r}
+plot(M1, which=1, add.smooth=FALSE)
+abline(h=0,lty=2)
+
+plot(M1, which=2, add.smooth=FALSE)
+
+```
+
+We can observe in the residual plot that the residuals are spread around zero, with one observation having a higher residual value. In addition, the normal QQ-plot the residuals seems to be close to the reference line on the plot. Thus the errors may be iid with a Normal($0,\sigma^2$) distribution.
+
+```{r}
+summary(M1)
+
+```
+
+The adjusted $R^2$ value of 0.9588 indicates that more than 95% of the total variation in Volume about its mean is explained by the linear association with the predictors Diam and Diam2. The residual standard error is 3.335.
+ 
+In additon, the $p$-values of the Diam variable are not under significant level 0.05, which we can conclude that Diam are not significant.

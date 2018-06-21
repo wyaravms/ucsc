@@ -1,0 +1,167 @@
+---
+title: "Homework 4"
+author: "Mary Silva, Wyara Moura Silva, and Peter Trubey"
+date: "November 10, 2017"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Chapter 8
+### Question 1
+```{r c8q1}
+mileage = data.frame(
+  model = c(rep('A',2),rep('B',3),rep('C',3),rep('D',2)),
+  mileage = c(22,26,28,24,29,29,32,28,23,24)
+)
+mileage.model = lm(mileage ~ model, data = mileage)
+anova(mileage.model)[["Pr(>F)"]][1] <= 0.05
+```
+
+### Question 3
+$$
+Y_{i,j} = \mu + \alpha_i + \varepsilon_{i,j} \hspace{1cm} \varepsilon_{i,j} \sim N(0,\sigma^2)\\
+Y = X\beta  + \varepsilon\\
+\begin{pmatrix}
+y_{1,1}\\
+\vdots\\
+y_{1,n}\\
+y_{2,1}\\
+\vdots\\
+y_{2,n}\\
+y_{3,1}\\
+\vdots\\
+y_{3,n}\\
+\end{pmatrix} = 
+\begin{pmatrix}
+1,0,0 \\
+\vdots \\
+1,0,0 \\
+1,1,0 \\
+\vdots \\
+1,1,0 \\
+1,0,1 \\
+\vdots \\
+1,0,1 \\
+\end{pmatrix}
+\begin{pmatrix}
+\mu\\
+\alpha_2\\
+\alpha_3\\
+\end{pmatrix}
++
+\begin{pmatrix}
+\varepsilon_{1,1}\\
+\vdots\\
+\varepsilon_{1,n}\\
+\varepsilon_{2,1}\\
+\vdots\\
+\varepsilon_{2,n}\\
+\varepsilon_{3,1}\\
+\vdots\\
+\varepsilon_{3,n}\\
+\end{pmatrix}
+$$
+To prevent singularity in the model matrix, we drop the $\alpha$ for Setosa, and $\mu$, instead of representing the grand mean, now represents the average for Setosa.
+
+The unknown parameters for our one-way ANOVA are contained in the $beta$ vector, $\mu$, $\alpha_2$, and $\alpha_3$, with $\mu$ representing Setosa's mean value, and $\alpha_2$ and $\alpha_3$ representing Versicolor's and Virginica's average deviations from that mean value.
+
+```{r c8q3}
+data(iris)
+sl.model = lm(Sepal.Length ~ Species, data = iris)
+anova(sl.model)
+```
+
+```{r}
+sl.model$coefficients
+```
+
+The parameter estimates are given as above, with Setosa having an average value of 5.006, Versicolor deviating from Setosa by 0.930, and Virginica deviating from Setosa by 1.582.
+
+### Question 4
+
+The assumption required for model inference in QUestion 3 is that the errors, $\varepsilon_{i,j}$ are distributed normally, with mean 0 and variance $\sigma^2$.
+
+To check if there is a problem with the residuals, we can observe the fit plots associated with the model.
+
+```{r}
+par(mfrow=c(2,2))
+plot(sl.model)
+```
+
+We don't see any serious issues, but there is some worrying straying from the diagonal on the QQ plot.  Additionally, we can conduct a Shapiro Wilks test of residuals to test whether the residuals are not normally distributed.
+
+```{r}
+shapiro.test(sl.model$residuals)
+```
+
+With a p-value of 0.2189, we have no evidence that the residuals are not normally distributed.
+
+### Question 5
+```{r}
+url = 'http://personal.bgsu.edu/~mrizzo/Rx/Rx-data/PATIENT.DAT'
+patient = read.table(url, sep = '\t')
+names(patient) = c('stomach','bronchus','colon','ovary','breast')
+patient.long = na.omit(stack(patient))
+names(patient.long) = c('time','organ')
+```
+
+```{r}
+patient.model = lm(time ~ organ, data = patient.long)
+par(mfrow = c(2,2))
+plot(patient.model)
+```
+
+The residuals are clearly not normal, there is marked deviance from the diagonal on the QQ plot, and strong heteroscedasticity on the residuals vs fitted values plot.
+
+```{r}
+shapiro.test(patient.model$residuals)
+```
+
+with a p-value of less than 0.05, we have strong evidence that the errors are not normally distributed.  Therefore, this model formulation is not valid.  We can look at a log transformation of the $Y$ variable, survival time.
+
+```{r}
+patient.long$logtime = log(patient.long$time)
+patient.logmodel = lm(logtime ~ organ, data = patient.long)
+summary(patient.logmodel)
+```
+
+In this model, the intercept takes the mean value for stomach.  It appears that Bronchus does not deviate significantly from stomach, while colon shows a weak significant difference from stomach with a p-value of 0.08120.  Ovary and Breast are strongly significantly different from stomach.
+
+```{r}
+patient.logaov = aov(logtime ~ organ, data = patient.long)
+TukeyHSD(patient.logaov)
+```
+
+Using Tukey's Honest Significant Difference (HSD) test, we see that breast is significantly different from stomach and Bronchus, but no other significant pairwise differences, even at alpha values up to 0.2.
+
+## Chapter 9
+### Question 1
+```{r}
+url = 'http://personal.bgsu.edu/~mrizzo/Rx/Rx-data/rounding.txt'
+rounding = read.table(url, header = TRUE)
+names(rounding) = c('time','method','player')
+rounding$player = as.factor(rounding$player)
+str(rounding)
+```
+
+```{r}
+rounding.model = lm(time ~ method + player, data = rounding)
+```
+
+Treating players as the relevant blocks, we can't look for interaction effects between blocks and players as we would have more than 66 terms to estimate, meaning we would run out of degrees of freedom.
+
+```{r}
+par(mfrow=c(2,2))
+plot(rounding.model)
+```
+
+There might be some heteroscedasticity in the residuals, with a bulge in variance right in the middle of the fitted values, but that might also be because there are more data there.  We should check the Shapiro Wilks test.
+
+```{r}
+shapiro.test(rounding.model$residuals)
+```
+
+The shapiro test concludes that the fitted values are not normal.  We should investigate how to fix that.

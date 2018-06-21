@@ -1,0 +1,417 @@
+---
+title: "Homework 2"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+libraries = c('lattice')
+sapply(libraries, library, character.only = TRUE)
+```
+
+## Chapter 4
+
+### Question 1
+```{r}
+data(cars)
+plot(
+  dist ~ speed, data = cars, 
+  xlab = 'Speed (mpg)', ylab = 'Stopping Distance (ft)', 
+  main = 'Stopping Distance vs Speed for cars',
+  col = 'red', pch = 17
+  )
+```
+
+### Question 4 NEEDS COMMENTS
+```{r}
+data(mtcars)
+#par(mfrow = c(2,2), oma = c(0,0,3,0))
+plot(mpg ~ disp, data = mtcars)
+plot(mpg ~ wt, data = mtcars)
+plot(mpg ~ drat, data = mtcars)
+plot(mpg ~ hp, data = mtcars)
+title('MPG vs car attributes, using mtcars')
+#par()
+
+#mtmodel = lm(scale(mpg) ~ scale(disp) + scale(wt) + scale(drat) + scale(hp), data = mtcars)
+
+
+
+```
+
+### Question 5
+```{r}
+house=function(x, y, ...){
+  lines(c(x - 1, x + 1, x + 1, x - 1, x - 1),
+  c(y - 1, y - 1, y + 1, y + 1, y - 1), ...)
+  lines(c(x - 1, x, x + 1), c(y + 1, y + 2, y + 1), ...)
+  lines(c(x - 0.3, x + 0.3, x + 0.3, x - 0.3, x - 0.3),
+  c(y - 1, y - 1, y + 0.4, y + 0.4, y - 1), ...)
+  }
+plot.new()
+plot.window(xlim=c(0,10),ylim=c(0,10))
+house(1,1)
+house(4,2)
+house(7,6)
+house(1,8,col='red',lwd=2,lty=2)
+house(4.5,7,col='blue',lwd=2,lty=3)
+house(8,1,col='green',lwd=2,lty=4)
+box()
+
+```
+
+### Question 6
+```{r}
+par(mfrow=c(1,2))
+curve(dbeta(x,2,6), from = 0, to = 1, col = 'red', lwd = 2)
+curve(dbeta(x,4,4), from = 0, to = 1, col = 'green', lwd = 2, add = TRUE)
+curve(dbeta(x,6,2), from = 0, to = 1, col = 'blue', lwd = 2, add = TRUE)
+title(expression(f(y)==frac(1,B(a,b))*y^{a-1}*(1-y)^{b-1}))
+text(x = 0.2, y = 2, labels = '(2,6)', col = 'red')
+text(x = 0.5, y = 2.3, labels = '(4,4)', col = 'green')
+text(x = 0.8, y = 2, labels = '(6,2)', col = 'blue')
+
+curve(dbeta(x,2,6), from = 0, to = 1, col = 'red', lwd = 2)
+curve(dbeta(x,4,4), from = 0, to = 1, col = 'green', lwd = 2, lty = 2, add = TRUE)
+curve(dbeta(x,6,2), from = 0, to = 1, col = 'blue', lwd = 2, lty = 3, add = TRUE)
+title(expression(f(y)==frac(1,B(a,b))*y^{a-1}*(1-y)^{b-1}))
+legend(
+  'bottomright', 
+  col = c('red','green','blue'),
+  lty = c(1,2,3),
+  lwd = 2,
+  legend = c('(2,6)','(4,4)','(6,2)')
+  )
+```
+
+
+
+```{r, include = FALSE}
+par(mfrow = c(1,1))
+```
+### Question 7
+```{r}
+data(faithful)
+faithful$length = ifelse(faithful$eruptions < 3.2, 'short','long')
+par(mfrow = c(1,2))
+bwplot(waiting ~ length, data = faithful, main = 'Boxplot of Waiting Times,\nShort vs Long Eruptions')
+densityplot(~waiting, groups = length, data = faithful)
+```
+
+## Chapter 5
+### Question 1
+
+```{r}
+#(a)
+
+dat=read.csv(url("http://personal.bgsu.edu/~mrizzo/Rx/Rx-data/college.txt"), sep="\t")
+
+college = subset(dat, complete.cases(dat))
+
+#college$Pct.20
+stripchart(college$Pct.20, method="stack", pch=19, xlab="Small classes Percentage", 
+           main="Stack Method")
+stripchart(college$Pct.20, method="jitter", pch=19, xlab="Small classes Percentage", 
+           main="Jitter Method")
+```
+
+The stack method will stack the dots and we can see that there are much universities with the percentage of small classes between 30 and 50 %. 
+
+The jitter method plot the dots of the data with a sligth amount of irregular movement. And we can see that the points are more concentrated at the same interval of percentage.
+
+```{r}
+#(b)
+stripchart(Pct.20 ~ Tier, method="stack", pch=19, xlab="Small classes Percentage",
+           ylab="Tier", xlim=c(20, 100), data=college)
+identify(college$Pct.20, college$Tier, n=1, labels=college$School)
+
+```
+
+
+```{r}
+#(c)
+mc=median(college$Pct.20)
+mc
+
+stripchart(college$Pct.20, method="stack", pch=19, xlab="Small classes Percentage",
+           , xlim=c(20, 100))
+abline(v=mc)
+
+```
+
+### Question 2
+
+```{r}
+#(a)
+plot(college$Pct.20, college$Pct.50, xlab="Small classes", ylab="Large classes")
+
+```
+
+```{r}
+#(b)
+plot(college$Pct.20, college$Pct.50, xlab="Small classes Percentage", 
+     ylab="Large classes Percentage")
+fit = line(college$Pct.20, college$Pct.50)
+fit
+abline(coef(fit))
+
+```
+
+```{r}
+#(c)
+CP20=60
+CP50=fit$coefficients[1]-(fit$coefficients[2]*CP20)
+CP50
+```
+
+```{r}
+#(d)
+plot(college$Pct.20, fit$residuals, xlab="Small classes Percentage", ylab="Residuals")
+abline(h=0)
+```
+The residuals for a small Pct.20 does not show a evident pattern, the values seems to be random.
+
+```{r}
+plot(college$Pct.50, fit$residuals, xlab="Small classes Percentage", ylab="Residuals")
+abline(h=0)
+```
+The residuals for a large Pct.50 does show a evident pattern, the values seems not be random. There is a patter of growth in a linear way.
+
+```{r}
+#(e)
+plot(college$Pct.20, fit$residuals, xlab="Small classes Percentage", ylab="Residuals")
+identify(college$Pct.20, fit$residuals, n=7, labels=college$School) 
+
+```
+The seven positive residuals that exceed 10 in values are University of California, San Diego, University California, Davis, UCLA, Texas - Dallas. This indicate that their percentage of large classes is large given their percentage of small classes.
+
+The University San Diego, DePaul are St Thomas have the large negative residuals. These school's with large classes percentage is lower than would predict from their small classes percentage.
+
+### Question 5
+```{r}
+#(a)
+college$Full.time
+hist(college$Full.time, main="Percentage of faculty hired full-time", xlab="Percentage")
+
+```
+It can be seem that there is a larger amount of faculty that are hired full-time given that the distribution of the data is concentrated mostly in the rigth side of the graph, with higher frenquecy (left-skewed).
+
+```{r}
+#(b)
+froot=sqrt(college$Full.time)-sqrt(100-college$Full.time)
+flog = log(college$Full.time + 0.5) - log(100 - college$Full.time + 0.5)
+
+hist(froot, main="Froot Full time")
+hist(flog, main="Flog Full time")
+
+```
+The flog transformation makes the full-time percentage approximately symmetric, but the froot transformation does not.
+
+```{r}
+#(c)
+mean(flog)-sd(flog)
+mean(flog)+sd(flog)
+
+hist(flog, main="Flog Full time")
+abline(v=1.20476, col=2)
+abline(v=3.037732, col=2)
+```
+
+### Question 7
+```{r}
+#(a)
+college$Alumni.giving
+stripchart(Alumni.giving ~ Tier, method="stack", pch=19, xlab="Alumni giving rates",
+           ylab="Tier", data=college)
+
+```
+
+```{r}
+#(b and c)
+```
+As one moves from Tier 4 to Tier 1, the average of giving tends to increase. And the spread also increase.
+
+```{r}
+#(d)
+roots = sqrt(college$Alumni.giving)
+logs = log(college$Alumni.giving)
+
+stripchart(roots ~ Tier, method="stack", pch=19, xlab="Alumni giving rates",
+           ylab="Tier", data=college)
+
+
+boxplot(logs ~ Tier, data=college, horizontal=TRUE, 
+        xlab="Froot", ylab="Tier")
+
+```
+
+```{r}
+#(e)
+```
+It can be seen that the square root transformation make the data spread approximately the same between groups. However, the log transformation did not make the spread approximately the same.
+
+
+## Additional Problem
+### Part A
+```{r}
+setwd("~/Desktop")
+dat = read.table("GS.csv", header=T, as.is = T, sep="\t")
+subj_df = dat[,-6]
+names(subj_df) = c("Field", "Yr2010", "Yr2011", "Yr2012", "Yr2013", "Yr2014", "Yr2015")
+head(subj_df)
+```
+
+```{r, echo=F, include= F}
+SEH = data.frame()
+for(i in 1:length(subj_df[,1])){
+  if((subj_df[i,1] == "Science") | (subj_df[i,1] == "Engineering") | (subj_df[i,1] == "Health")){
+    SEH = rbind(SEH, subj_df[i,])
+  }
+}
+
+SEH
+SEHt <- reshape(SEH, direction="long", varying=list(names(SEH)[2:7]), v.names="Freq", 
+                idvar=c("Field"), timevar="Year", times=2010:2015)
+SciHeEng = data.frame(SEHt$Field, SEHt$Year, SEHt$Freq)
+```
+
+```{r}
+barchart((SciHeEng$SEHt.Freq*.001) ~ as.factor(SciHeEng$SEHt.Year), 
+         groups=SciHeEng$SEHt.Field, data = SciHeEng, auto.key = list(columns = 3),
+         main = "Number of Grad Students By Year\n", xlab = "Year", 
+         ylab = "No. of Graduates in thousands")
+```
+
+From the above bar chart, it appears that Engineering and Science have increased slightly, but Health may have decreased slightly. Based on the scaling, the increases/decreases are not obvious. Next, we examine plots of the three subjects individually over time.
+
+```{r, echo=F}
+Science = NA
+Engineering = NA
+Health = NA
+for (i in 2:7){
+  Science[i - 1] = SEH[1,i]
+}
+for (i in 2:7){
+  Engineering[i - 1] = SEH[2,i]
+}
+for (i in 2:7){
+  Health[i - 1] = SEH[3,i]
+}
+Year = c(2010, 2011, 2012, 2013, 2014, 2015)
+```
+
+```{r}
+Science = Science/1000
+plot(Science ~ Year, main = "Science Graduates by Year", 
+     ylab = "No. Graduates in Thousands",
+     xlab = "Year")
+lines((Science ~ Year), lwd = 1, col = 'red')
+```
+
+From the above plot, it is confirmed that the number of Science graduates from 2010 to 2015 increases; however there does appear to be a very small dip from 2011 to 2012. 
+
+```{r, echo=FALSE}
+Health = Health/100
+plot(Health ~ Year, main = "Health Graduates by Year", 
+     ylab = "No. Graduates in Hundreds",
+     xlab = "Year")
+lines((Health ~ Year), lwd = 1, col = 'red')
+```
+
+From the above plot, it is clearer that the number of health graduates decreases. We see that from 2010 to 2011 there is a sharp decrease of over 10,000 graduates followed by a small increase from 2013 to 2015.
+
+```{r, echo=F}
+Engineering = Engineering/1000
+plot(Engineering ~ Year, main = "Engineering Graduates by Year", 
+     ylab = "No. Graduates in Hundreds",
+     xlab = "Year")
+lines((Engineering ~ Year), lwd = 1, col = 'red')
+```
+
+Similar to the number of science graduates, we see an overall increase from 2010 to 2015. It is more clear in this plot that there was a small dip in 2011, followed by a continuous increase through 2015.
+
+```{r, echo=F, include=F}
+SEH = data.frame()
+for(i in 1:length(subj_df[,1])){
+  if((subj_df[i,1] == "Science") | (subj_df[i,1] == "Engineering") | (subj_df[i,1] == "Health")|
+     (subj_df[i,1] == "Statistics") | (subj_df[i,1] == "Mathematics and applied mathematics")|
+     (subj_df[i,1] == "Computer sciences")){
+    SEH = rbind(SEH, subj_df[i,])
+  }
+}
+
+Science = NA
+CS = NA
+Statistics = NA
+Engineering = NA
+Health = NA
+AM = NA
+for (i in 2:7){
+  Science[i - 1] = SEH[1,i]
+}
+for (i in 2:7){
+  CS[i - 1] = SEH[2,i]
+}
+for (i in 2:7){
+  AM[i - 1] = SEH[3,i]
+}
+for (i in 2:7){
+  Statistics[i - 1] = SEH[4,i]
+}
+for (i in 2:7){
+  Engineering[i - 1] = SEH[5,i]
+}
+for (i in 2:7){
+  Health[i - 1] = SEH[6,i]
+}
+
+Year = c(2010, 2011, 2012, 2013, 2014, 2015)
+```
+
+```{r, echo=F}
+plot(Statistics ~ Year, main = "Statistics Graduates by Year",
+     ylab = "No. Graduates in Hundreds",
+     xlab = "Year")
+lines((Statistics ~ Year), lwd = 1, col = 'red')
+```
+
+Statistics shows an increase in graduate students from 2010 to 2015, similar to Science and Engineering.
+
+### Part B
+```{r, echo=F}
+plot(AM ~ Year, main = "Mathematics and Applied Math Graduates by Year",
+     ylab = "No. of Graduates",
+     xlab = "Year")
+lines((AM ~ Year), lwd = 1, col = 'red')
+```
+
+Mathematics and applied math shows an increase from 2010 to 2015, with an unusual dip from 2012 to 2013. 
+
+```{r, echo=F}
+AMS_diff= AM - Statistics
+plot(AMS_diff ~Year, main = "Difference of Math and Stats graduates",
+     xlab = "Year", ylab = "Difference: Math and Stats")
+points(AMS_diff ~ Year, pch=20)
+lines((AMS_diff ~ Year),lwd=1,col='red')
+```
+
+Between 2010 and 2015, the number of math and applied math graduates was greater than the number of stats graduates but we can see that the difference decreases steadily from 2012 to 2015.
+
+```{r, echo=F}
+plot(CS ~ Year, main = "Computer Science Graduates by Year",
+     ylab = "No. of Graduates",
+     xlab = "Year")
+lines((CS ~ Year), lwd = 1, col = 'red')
+```
+
+The number of computer science graduates remains steady from 2010 to 2012, then sharply increases from 2012 to 2015.
+
+```{r, echo=F}
+CS_diff= CS - Statistics
+plot(CS_diff ~Year, main = "Difference of Computer Science \n and Stats graduates",
+     xlab = "Year", ylab = "Difference: CS and Stats")
+points(CS_diff ~ Year, pch=20)
+lines((CS_diff ~ Year),lwd=1,col='red')
+```
+
+From 2010 to 2015, the number of computer science graduates was greater than the number of statistics graduates, but from 2012 to 2015 the difference increases. 
