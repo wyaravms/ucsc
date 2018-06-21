@@ -1,0 +1,62 @@
+\documentclass[a4paper, 12pt]{article}
+\usepackage[margin=1 in]{geometry}
+\usepackage{comment} % enables the use of multi-line comments (\ifx \fi) 
+\usepackage{lipsum} %This package just generates Lorem Ipsum filler text. 
+\usepackage{fullpage} % changes the margin
+\usepackage{multirow}	
+\usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage{color}
+\usepackage{graphicx}
+\usepackage{tikz}
+\usetikzlibrary{automata,arrows,positioning,calc}
+
+
+\newcommand\tab[1][1cm]{\hspace*{#1}}
+
+
+
+\title{\textbf{Project Proposal \\ \small{Flight Arrival Delay Analysis}}}
+
+\date{}
+\author{Mary Silva \and Wyara Moura Silva}
+\begin{document}
+
+%Header-Make sure you update this information!!!!
+\noindent
+\maketitle
+
+\section*{The Data}
+
+
+\tab The U.S. Department of Transportation's \textit{Airline On-Time Performance Data}\cite{DOT} is a database that contains flight records spanning the past  20 years. Records of flight departures from up to 13 major airline carriers and 306 origin cities across the United States, including the arrival delay in minutes and the distance of each flight are contained in the database. For January 2017 alone, this is approximately 450,000 recorded observations of flight delays. 
+
+We intend to combine this dataset with weather data to be collected from {National Oceanic and Atmospheric Administration}\cite{NOAA}. The first choice of climatic data would be precipitation data. These dataset are hourly precipitation where they provide hourly amounts of precipitation per hour for a network of more than 7000 stations located mainly in the United States. In addition, we also have the option to use data of 15 minutes of precipitation, so we will decide which variable best fits the model, which we will use. The other weather data options are temperature, wind speed, which can also be collected in \cite{NOAA}.
+
+
+The objective for this project is both inference and prediction. Ideally we would like to determine which variables (i.e. precipitation, temperature, wind speed, distance of flight, date of flight, etc.) effect flight delays. This will be able to answer our main question of what factors contribute to delays in flight. Additionally, we would like to be able to produce a model which can predict delays based on statistically significant variables. To reduce the size of the dataset, we may only span one year and between 10-12 popular U.S. airports.
+
+
+
+\section*{Methodology}
+
+We have not decided if a linear regression or a logistic regression approach will be appropriate. It's possible we may look into both methods. If we were to take a linear regression approach, the response variable will be the delay in minutes. Since predicting the exact delay in minutes doesn't seem useful, this approach may only be used for determining statistically significant variables. If we were to take a logistic regression approach, the response will be treated as binary, separating the data into delays less than 30 minutes from delays greater than or equal to 30 minutes. 
+
+\section*{Additional Comments}
+
+Because the \textit{Airline On-Time Performance Data} is popular dataset, similar analysis of this data may have been produced. However, we only plan to use a specific subset of the dataset; for instance, we may only use the past year. Also, by combining this dataset with weather data which our conclusions are expected to be unique.
+
+\begin{thebibliography}{9}
+
+\bibitem{DOT} 
+United States Department of Transportation. (2016). 
+\textit{Airline On-Time Performance Data}. 
+Retrieved from \texttt{https://www.transtats.bts.gov}
+
+\bibitem{NOAA} 
+National Oceanic and Atmospheric Administration. (2016). 
+\textit{National Climatic Data Center}. 
+Retrieved from \texttt{https://www.ncdc.noaa.gov}
+
+\end{thebibliography}
+\end{document}
