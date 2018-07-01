@@ -21,75 +21,85 @@ axis(2, cex.axis=1.6)
 # exploratory plots
 pairs(sst[,c(-1,-5)], pch=16, panel=panel.smooth, cex.axis=1.5, cex.lab=1.5)
 
-#fit = lm(temp ~ lat + lon + X[,4], data=sst, x=TRUE, y=TRUE)
 fit = lm(temp ~ lat + lon + Type, data=sst, x=TRUE, y=TRUE)
 
 X = fit$x
 ncov = ncol(X)
 summary(fit)
 
-# gibbs steps
-nmc = 41000
+# gibbs function
 
-# hyperparameters
-alpha = 3; beta = 3
-a = 2; b =2
-
-post.mu.i = array(NA, dim=c(nmc, n))
-post.sigma.i = array(NA, dim=c(nmc, n))
-post.beta = array(NA, dim=c(nmc, ncov))
-post.sigma = array(NA, nmc)
-post.tau = array(NA, nmc)
-
-# initial values
-post.tau[1] = 1.5
-post.mu.i[1,] = y
-post.sigma.i[1,] = 1.5
-post.sigma[1] = 1.5
-
-for (i in 2:nmc){
+sst.gibbs = function(X, y, nd, n, nmc, n.bur, thin){
   
-  m.beta = solve(t(X)%*%X)%*%t(X)%*%post.mu.i[i-1,]
-  var.beta = post.tau[i-1]*solve(t(X)%*%X)
+  # hyperparameters
+  alpha = 3; beta = 3
+  a = 2; b =2
   
-  post.beta[i,] = rmvnorm(1, m.beta, var.beta)
+  post.mu.i = array(NA, dim=c(nmc, n))
+  post.sigma.i = array(NA, dim=c(nmc, n))
+  post.beta = array(NA, dim=c(nmc, ncov))
+  post.sigma = array(NA, nmc)
+  post.tau = array(NA, nmc)
   
-  a.tau = (n/2) - 1 
-  #b.tau = sum((post.mu.i[i-1,] - X%*%post.beta[i,])^2)/2
-  b.tau = (post.mu.i[i-1,] - (X%*%post.beta[i,]))
+  # initial values
+  post.tau[1] = 1.5
+  post.mu.i[1,] = y
+  post.sigma.i[1,] = 1.5
+  post.sigma[1] = 1.5
   
-  #sigma.hat = sum((y-X%*%m.beta)^2)/(n-qr(X)$rank)
+  for (i in 2:nmc){
+    
+    m.beta = solve(t(X)%*%X)%*%t(X)%*%post.mu.i[i-1,]
+    var.beta = post.tau[i-1]*solve(t(X)%*%X)
+    
+    post.beta[i,] = rmvnorm(1, m.beta, var.beta)
+    
+    a.tau = (n/2) - 1 
+    #b.tau = sum((post.mu.i[i-1,] - X%*%post.beta[i,])^2)/2
+    b.tau = (post.mu.i[i-1,] - (X%*%post.beta[i,]))
+    
+    #sigma.hat = sum((y-X%*%m.beta)^2)/(n-qr(X)$rank)
+    
+    #post.tau[i] = 1/rgamma(1, ((n-qr(X)$rank)/2), (n-qr(X)$rank)*sigma.hat/2)
+    post.tau[i] = 1/rgamma(1, a.tau, (t(b.tau)%*%b.tau)/2)
+    
+    m.mui = ((y*post.tau[i]*nd) + (X%*%post.beta[i,]*post.sigma.i[i-1,]))/(post.tau[i]*nd + post.sigma.i[i-1,])
+    var.mui = (post.sigma.i[i-1,]*post.tau[i])/((post.tau[i]*nd)+(post.sigma.i[i-1,]))
+    
+    post.mu.i[i,] = rnorm(n,as.vector(m.mui),sqrt(var.mui))
+    
+    a.sigmai = 1/2 + (alpha + 1)
+    b.sigmai = ((((y - post.mu.i[i,])^2)*nd)/2) + alpha*post.sigma[i-1]
+    
+    post.sigma.i[i,] = 1/rgamma(n,a.sigmai,b.sigmai)
+    
+    a.sigma = n*(alpha + 1) + a
+    b.sigma = (alpha*sum(1/(post.sigma.i[i,]))) + b
+    
+    post.sigma[i] = rgamma(1, a.sigma, b.sigma)
+    
+    cat(i, "/", nmc, "\r")
+  }
   
-  #post.tau[i] = 1/rgamma(1, ((n-qr(X)$rank)/2), (n-qr(X)$rank)*sigma.hat/2)
-  post.tau[i] = 1/rgamma(1, a.tau, (t(b.tau)%*%b.tau)/2)
+  n.bur = n.bur; thin = thin
   
-  m.mui = ((y*post.tau[i]*nd) + (X%*%post.beta[i,]*post.sigma.i[i-1,]))/(post.tau[i]*nd + post.sigma.i[i-1,])
-  var.mui = (post.sigma.i[i-1,]*post.tau[i])/((post.tau[i]*nd)+(post.sigma.i[i-1,]))
+  post.beta = post.beta[seq(n.bur+1, nmc,by=thin),]
+  post.tau = post.tau[seq(n.bur+1, nmc,by=thin)]
+  post.mu.i = post.mu.i[seq(n.bur+1, nmc,by=thin),]
+  post.sigma.i = post.sigma.i[seq(n.bur+1, nmc,by=thin),]
+  post.sigma = post.sigma[seq(n.bur+1, nmc,by=thin)]
   
-  post.mu.i[i,] = rnorm(n,as.vector(m.mui),sqrt(var.mui))
-  
-  a.sigmai = 1/2 + (alpha + 1)
-  b.sigmai = ((((y - post.mu.i[i,])^2)*nd)/2) + alpha*post.sigma[i-1]
-  
-  post.sigma.i[i,] = 1/rgamma(n,a.sigmai,b.sigmai)
-  
-  a.sigma = n*(alpha + 1) + a
-  b.sigma = (alpha*sum(1/(post.sigma.i[i,]))) + b
-  
-  post.sigma[i] = rgamma(1, a.sigma, b.sigma)
-  
-  cat(i, "/", nmc, "\r")
+  list(post.beta=post.beta, post.tau=post.tau, post.mu.i=post.mu.i, post.sigma.i=post.sigma.i, post.sigma=post.sigma)
 }
 
-n.bur = 1000; thin = 4
+posts = sst.gibbs(X = X, y = y, nd=nd, n=n, nmc=41000, n.bur=1000, thin=4)
 
-post.beta = post.beta[seq(n.bur+1, nmc,by=thin),]
-post.tau = post.tau[seq(n.bur+1, nmc,by=thin)]
-post.mu.i = post.mu.i[seq(n.bur+1, nmc,by=thin),]
-post.sigma.i = post.sigma.i[seq(n.bur+1, nmc,by=thin),]
-post.sigma = post.sigma[seq(n.bur+1, nmc,by=thin)]
-
-nmcb = length(post.sigma)
+nmcb = length(posts$post.sigma)
+post.beta = posts$post.beta
+post.tau = posts$post.tau
+post.mu.i = posts$post.mu.i
+post.sigma.i = posts$post.sigma.i
+post.sigma = posts$post.sigma
 
 # plotting the posterior distributions
 # the chains, densities and correlations plots
