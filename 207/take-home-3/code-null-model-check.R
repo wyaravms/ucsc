@@ -22,67 +22,15 @@ X.null = fit.null$x
 ncov = ncol(X.null)
 summary(fit.null)
 
-# gibbs steps
-nmc = 41000
+# sst.gibbs function from the file code.R
+posts.null = sst.gibbs(X = X.null, y = y, nd=nd, n=n, nmc=41000, n.bur=1000, thin=4)
 
-# hyperparameters
-alpha = 3; beta = 3
-a = 2; b =2
-
-post.mu.i.null = array(NA, dim=c(nmc, n))
-post.sigma.i.null = array(NA, dim=c(nmc, n))
-post.beta.null = array(NA, dim=c(nmc, ncov))
-post.sigma.null = array(NA, nmc)
-post.tau.null = array(NA, nmc)
-
-# initial values
-post.tau.null[1] = 1.5
-post.mu.i.null[1,] = y
-post.sigma.i.null[1,] = 1.5
-post.sigma.null[1] = 1.5
-
-for (i in 2:nmc){
-  
-  m.beta.null = solve(t(X.null)%*%X.null)%*%t(X.null)%*%post.mu.i.null[i-1,]
-  var.beta.null = post.tau.null[i-1]*solve(t(X.null)%*%X.null)
-  
-  post.beta.null[i,] = rmvnorm(1, m.beta.null, var.beta.null)
-  
-  a.tau.null = (n)/2 - 1 
-  b.tau.null = sum((post.mu.i.null[i-1,] - X.null%*%post.beta.null[i,])^2)/2
-  
-  sigma.hat.null = sum((y-X.null%*%m.beta.null)^2)/(n-qr(X.null)$rank)
-  
-  #post.tau[i] = 1/rgamma(1, ((n-qr(X)$rank)/2), (n-qr(X)$rank)*sigma.hat/2)
-  post.tau.null[i] = 1/rgamma(1, a.tau.null, b.tau.null)
-  
-  m.mui.null = ((y*post.tau.null[i]*nd) + (X.null%*%post.beta.null[i,]*post.sigma.i.null[i-1,]))/(post.tau.null[i]*nd + post.sigma.i.null[i-1,])
-  var.mui.null = (post.sigma.i.null[i-1,]*post.tau.null[i])/((post.tau.null[i]*nd)+(post.sigma.i.null[i-1,]))
-  
-  post.mu.i.null[i,] = rnorm(n,as.vector(m.mui.null),sqrt(var.mui.null))
-  
-  a.sigmai.null = 1/2 + (alpha + 1)
-  b.sigmai.null = ((((y - post.mu.i.null[i,])^2)*nd)/2) + alpha*post.sigma.null[i-1]
-  
-  post.sigma.i.null[i,] = 1/rgamma(n,a.sigmai.null,b.sigmai.null)
-  
-  a.sigma.null = n*(alpha + 1) + a
-  b.sigma.null = (alpha*sum(1/(post.sigma.i.null[i,]))) + b
-  
-  post.sigma.null[i] = rgamma(1, a.sigma.null, b.sigma.null)
-  
-  cat(i, "/", nmc, "\r")
-}
-
-n.bur = 1000; thin = 4
-
-post.beta.null = post.beta.null[seq(n.bur+1, nmc,by=thin),]
-post.tau.null = post.tau.null[seq(n.bur+1, nmc,by=thin)]
-post.mu.i.null = post.mu.i.null[seq(n.bur+1, nmc,by=thin),]
-post.sigma.i.null = post.sigma.i.null[seq(n.bur+1, nmc,by=thin),]
-post.sigma.null = post.sigma.null[seq(n.bur+1, nmc,by=thin)]
-
-nmcb = length(post.sigma.null)
+nmcb = length(posts.null$post.sigma)
+post.beta.null = posts.null$post.beta
+post.tau.null = posts.null$post.tau
+post.mu.i.null = posts.null$post.mu.i
+post.sigma.i.null = posts.null$post.sigma.i
+post.sigma.null = posts.null$post.sigma
 
 par(mfrow=c(2,3))
 plot.ts(post.beta.null)
