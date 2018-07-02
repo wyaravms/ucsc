@@ -29,7 +29,7 @@ summary(fit)
 
 # gibbs function
 
-sst.gibbs = function(X, y, nd, n, nmc, n.bur, thin){
+sst.gibbs = function(X, y, nd, n, ncov, nmc, n.bur, thin){
   
   # hyperparameters
   alpha = 3; beta = 3
@@ -92,7 +92,7 @@ sst.gibbs = function(X, y, nd, n, nmc, n.bur, thin){
   list(post.beta=post.beta, post.tau=post.tau, post.mu.i=post.mu.i, post.sigma.i=post.sigma.i, post.sigma=post.sigma)
 }
 
-posts = sst.gibbs(X = X, y = y, nd=nd, n=n, nmc=41000, n.bur=1000, thin=4)
+posts = sst.gibbs(X = X, y = y, nd=nd, n=n, ncov=ncov, nmc=41000, n.bur=1000, thin=4)
 
 nmcb = length(posts$post.sigma)
 post.beta = posts$post.beta
@@ -387,3 +387,87 @@ ggplot(data = data.new.dev4.sd, aes(lon, lat, fill = y)) +
   geom_tile(data = data.new.dev1.sd, aes(lon, lat, fill = y)) +
   scale_fill_gradient(low = "white",high = "steelblue") +
   labs(x = "Longitude", y = "Latitude", fill = "temperature", title = "Temperature Device type: f.buoy")
+
+
+# fitting a null model (M2) to compare with the main model (M1)
+fit.null = lm(temp ~ 1, data=sst, x=TRUE, y=TRUE)
+X.null = fit.null$x
+ncov.null = ncol(X.null)
+summary(fit.null)
+
+posts.null = sst.gibbs(X=X.null, y=y, nd=nd, n=n, ncov=ncov.null, nmc=41000, n.bur=1000, thin=4)
+
+nmcb = length(posts.null$post.sigma)
+post.beta.null = posts.null$post.beta
+post.tau.null = posts.null$post.tau
+post.mu.i.null = posts.null$post.mu.i
+post.sigma.i.null = posts.null$post.sigma.i
+post.sigma.null = posts.null$post.sigma
+
+# plotting the posterior distributions
+# the chains, densities and correlations plots
+par(mfrow=c(2,2))
+plot.ts(post.tau.null, cex.lab=1.5, cex.main = 3,cex.axis=1.8, col=1, ylab="",main=expression(paste(tau^2)))
+plot.ts(post.sigma.null, cex.lab=1.5,cex.main = 3,cex.axis=1.8, col=1, ylab="",main=expression(paste(sigma^2)))
+acf(post.tau.null, cex.lab=1.5, cex.main = 3,cex.axis=1.8, col=1, ylab="",main=expression(paste(tau^2)))
+acf(post.sigma.null, cex.lab=1.5,cex.main = 3,cex.axis=1.8, col=1, ylab="",main=expression(paste(sigma^2)))
+
+par(mfrow=c(1,2))
+plot.ts(post.beta.null, cex.lab=1.5, cex.main = 2,cex.axis=1.8, main=substitute(paste(beta[0]),list(i=0)), ylab="")
+acf(post.beta.null, cex.lab=1.5, cex.main = 2,cex.axis=1.8, main=substitute(paste(beta[0]),list(i=0)), ylab="")
+
+par(mfrow=c(3,3))
+for(i in 10:18)
+  plot.ts(post.mu.i.null[,i],  cex.lab=1.5, cex.main = 2,cex.axis=1.8,main=substitute(paste(mu[i]),list(i=i)), ylab="")
+
+par(mfrow=c(3,3))
+for(i in 10:18)
+  acf(post.mu.i.null[,i], cex.lab=1.5, cex.main = 2,cex.axis=1.8, main=substitute(paste(mu[i]),list(i=i)), ylab="")
+
+
+# Posterior predictions
+pred.y.m2 = matrix(0, n, nmcb)
+for (i in 1:nmcb)
+  pred.y.m2[,i] = rnorm(n, post.mu.i.null[i,], sqrt(post.sigma.i.null[i,]/N))
+
+#Gelfand and Ghosh
+G1 = sum((apply(pred.y, 1, mean)-y)^2)
+P1 = sum(apply(pred.y,1,var))
+D1G = G1 + P1
+
+G2 = sum((apply(pred.y.m2, 1,mean)-y)^2)
+P2 = sum(apply(pred.y.m2,1,var))
+D2G = G2 + P2
+
+GGs = c(D1G,D2G)
+GGs
+
+# DIC (deviance information criteria) from the slides
+likelihood = function(y, mu.dic, sigma.dic){
+  val = sum(dnorm(y, mu.dic, sigma.dic, log = TRUE))
+  return(val)
+}
+
+hlp = NULL
+for(t in 1:nmcb){
+  hlp[t] = likelihood(y, post.mu.i[t,], sqrt(post.sigma.i[t,]/N))
+}
+mu.mean.dic = apply(post.mu.i, 2, mean)
+sigma.mean.dic = apply(post.sigma.i, 2, mean)
+
+lph = likelihood(y, mu.mean.dic, sqrt(sigma.mean.dic/N))
+pdic=2*(lph-mean(hlp))
+DIC.1=-2*lph+2*pdic
+
+hlp.2 = NULL
+for(t in 1:nmcb){
+  hlp.2[t] = likelihood(y, post.mu.i.null[t,], sqrt(post.sigma.i.null[t,]/N))
+}
+mu.mean.dic.2 = apply(post.mu.i.null, 2, mean)
+sigma.mean.dic.2 = apply(post.sigma.i.null, 2, mean)
+
+lph.2 = likelihood(y, mu.mean.dic.2, sqrt(sigma.mean.dic.2/N))
+pdic.2 = 2*(lph.2-mean(hlp.2))
+DIC.2 = -2*lph.2+2*pdic.2
+
+c(DIC.1,DIC.2)
